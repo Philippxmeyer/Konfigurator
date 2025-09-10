@@ -1,0 +1,41 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+.app {
+  display: flex;
+  height: 100vh;
+}
+#preview {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9f9f9;
+  border-right: 1px solid #ccc;
+  position: relative;
+}
+#preview img {
+  position: absolute;
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
+}
+#preview img.show { opacity: 1; }
+
+.sidebar {
+  width: 250px;
+  border-left: 1px solid #ccc;
+  padding: 10px;
+}
+.section h2 {
+  background: #eee;
+  margin: 0;
+  padding: 6px;
+  cursor: pointer;
+}
+.section .content { padding: 8px; }
+.section.collapsed .content { display: none; }
+select {
+  width: 100%;
+  margin: 5px 0 15px 0;
+}
