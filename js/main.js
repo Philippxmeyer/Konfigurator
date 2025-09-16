@@ -32,8 +32,10 @@ async function init() {
   await loadArticles();
 
   // 2) Sidebar bauen (setzt Defaults aus config.xml)
-  const sidebarEl = document.getElementById("sidebar");
+  const sidebarEl = document.getElementById("sidebarContent");
   buildSidebar(configXML, sidebarEl, () => updatePreview(configXML, images));
+
+  setupArticleOverlay();
 
   // 3) Layer-Images vorbereiten – in #stage einhängen (Fallback: #preview)
   const stage = document.getElementById("stage") || document.getElementById("preview");
@@ -54,6 +56,36 @@ async function init() {
 
   // 6) Erste Darstellung
   updatePreview(configXML, images);
+}
+
+function setupArticleOverlay() {
+  const overlay = document.getElementById("articleOverlay");
+  const openBtn = document.getElementById("openArticleOverlay");
+  const closeBtn = document.getElementById("closeArticleOverlay");
+
+  if (!overlay || !openBtn || !closeBtn) return;
+
+  const showOverlay = () => {
+    overlay.classList.add("is-visible");
+    overlay.setAttribute("aria-hidden", "false");
+    closeBtn.focus();
+  };
+
+  const hideOverlay = () => {
+    if (!overlay.classList.contains("is-visible")) return;
+    overlay.classList.remove("is-visible");
+    overlay.setAttribute("aria-hidden", "true");
+    openBtn.focus();
+  };
+
+  openBtn.addEventListener("click", showOverlay);
+  closeBtn.addEventListener("click", hideOverlay);
+  overlay.addEventListener("click", event => {
+    if (event.target === overlay) hideOverlay();
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") hideOverlay();
+  });
 }
 
 init();
