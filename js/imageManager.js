@@ -31,14 +31,3 @@ export function placeImage(img, src, cfg) {
   img.style.transformOrigin = "top left";
   img.style.display = "block";
 }
-
-export function parseOffset(configXML, selector) {
-  const node = configXML.querySelector(selector);
-  if (!node) return null;
-  return {
-    x: +node.getAttribute("x"),
-    y: +node.getAttribute("y"),
-    scaleX: +node.getAttribute("scaleX"),
-    scaleY: +node.getAttribute("scaleY")
-  };
-}
