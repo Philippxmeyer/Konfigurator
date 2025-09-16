@@ -2,40 +2,220 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
 }
+
 .app {
   display: flex;
   height: 100vh;
 }
+
+#preview { touch-action: none; }
+
+
+/* --- Preview-Bereich --- */
 #preview {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;   /* oben ausrichten */
+  justify-content: center;   /* horizontal zentrieren */
   background: #f9f9f9;
   border-right: 1px solid #ccc;
   position: relative;
+  overflow: hidden;          /* nichts läuft über */
 }
-#preview img {
+
+/* Bühne (Zoom-Canvas) – echte Höhe via aspect-ratio statt fixer Pixel */
+#stage {
+  position: relative;
+  width: min(100%, 1200px);  /* Basisbreite, responsiv begrenzt */
+  aspect-ratio: 12 / 7;      /* entspricht z.B. 1200×700 */
+  transform-origin: top left;/* Offsets bleiben stabil beim Zoom */
+  will-change: transform;
+}
+
+/* Bilder hängen jetzt unter #stage */
+#stage img {
   position: absolute;
   opacity: 0;
   transition: opacity 0.4s ease-in-out;
 }
-#preview img.show { opacity: 1; }
 
+#stage img.show { opacity: 1; }
+
+
+/* --- Sidebar allgemein --- */
 .sidebar {
   width: 250px;
   border-left: 1px solid #ccc;
   padding: 10px;
 }
+
+/* --- Groups (Hauptblöcke) --- */
+.group > h1 {
+  font-size: 1.1em;
+  margin: 10px 0;
+  padding: 5px;
+  background: #dde;
+  cursor: pointer;
+  position: relative;
+}
+
+/* Plus/Minus für Gruppen */
+.group > h1::before {
+  content: "+";
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.group:not(.collapsed) > h1::before {
+  content: "−";
+}
+
+/* --- Sections (Unterpunkte) --- */
 .section h2 {
+  font-size: 1em;
   background: #eee;
   margin: 0;
-  padding: 6px;
+  padding: 6px 6px 6px 24px; /* Platz für + / - */
   cursor: pointer;
+  position: relative;
 }
-.section .content { padding: 8px; }
-.section.collapsed .content { display: none; }
+
+/* Plus/Minus für Sections */
+.section h2::before {
+  content: "−";
+  position: absolute;
+  left: 8px;
+  font-weight: bold;
+}
+
+.section.collapsed h2::before {
+  content: "+";
+}
+
+.section .content {
+  padding: 8px;
+}
+
+.section.collapsed .content {
+  display: none;
+}
+
+/* Wenn die ganze Gruppe collapsed ist → alle Sections darin auch einklappen */
+.group.collapsed .section {
+  display: none;
+}
+
+
+/* --- Select-Elemente --- */
 select {
   width: 100%;
   margin: 5px 0 15px 0;
+}
+
+/* --- Artikelliste --- */
+.article-list {
+  width: 220px;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  padding: 10px;
+  background: #fafafa;
+  overflow-y: auto;
+}
+
+.article-list h2 {
+  margin-top: 0;
+  font-size: 16px;
+}
+
+.article-list ul,
+#articleItems {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.article-list li,
+#articleItems li {
+  padding: 6px 4px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+#articleItems {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#articleItems li {
+  border-bottom: 1px solid #eee;
+}
+
+#articleItems li a.article-link {
+  display: block;
+  padding: 6px 4px;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 6px;
+}
+
+#articleItems li a.article-link:hover {
+  background: #f2f2f2;
+}
+
+
+#articleItems .code {
+  color: #555;
+  font-size: 13px;
+}
+
+/* --- Teilen-Link --- */
+.share-container {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+#shareInput {
+  flex: 1;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+#copyBtn {
+  cursor: pointer;
+  background: #eee;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 1em;
+  transition: background 0.2s;
+}
+
+#copyBtn:hover {
+  background: #ddd;
+}
+
+/* --- Logo oben links --- */
+:root {
+  --logo-width: 300px;   /* Breite ändern */
+  --logo-margin: 10px;   /* äußerer Abstand */
+  --logo-padding: 0px;   /* innerer Abstand */
+}
+
+#logo-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: var(--logo-margin);
+  padding: var(--logo-padding);
+  z-index: 1000; /* Immer über dem Rest */
+}
+
+#logo-container img {
+  width: var(--logo-width);
+  height: auto;
+  display: block;
 }

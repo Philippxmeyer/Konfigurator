@@ -1,0 +1,289 @@
+<config>
+ <groups>
+    <!-- Gruppe Tisch -->
+    <group id="tisch" title="Tisch">
+      <section id="grundtisch" title="Grundtisch">
+        <field id="breite" label="Breite" options="breiten"/>
+        <field id="gestell" label="Gestell" options="gestelle"/>
+        <field id="farbe" label="Farbe" options="farben"/>
+        <field id="platte" label="Platte" options="platten"/>
+      </section>
+      <section id="seitenblenden" title="Seitenblenden">
+        <field id="seitenblende" label="Variante" options="seitenblenden"/>
+        <field id="seitenfarbe" label="Farbe" options="seitenfarben"/>
+      </section>
+    </group>
+
+    <!-- Gruppe Aufbau -->
+    <group id="aufbaugruppe" title="Aufbau">
+      <section id="aufbau" title="Aufbauportal">
+        <field id="aufbau" label="Variante" options="aufbauten"/>
+      </section>
+      <section id="boeden" title="Verstellbare Böden">
+        <field id="bodenanzahl" label="Böden" options="bodenanzahl"/>
+      </section>
+      <section id="platten" title="Lochrasterplatten">
+        <field id="plattenanzahl" label="Platten" options="plattenanzahl"/>
+      </section>
+      <section id="laufschienen" title="Laufschienen">
+    	<field id="laufschienenanzahl" label="Anzahl" options="laufschienenanzahl"/>
+  	  </section>
+    </group>
+   <group id="unterbau" title="Unterbau">
+  <section id="container" title="Container">
+    <field id="containerpos" label="Variante" options="containerpos"/>
+    <field id="containerfarbe" label="Farbe" options="containerfarben"/>
+  </section>
+     <section id="ablagebord" title="Ablagebord">
+  <field id="ablagebord" label="Variante" options="ablagebordOptionen"/>
+</section>
+</group>
+   
+  </groups>
+
+  <options>
+   <breiten>
+      <wert id="750">750 mm</wert>
+      <wert id="1500" default="true">1500 mm</wert>
+      <wert id="2000">2000 mm</wert>
+    </breiten>
+    <gestelle>
+      <wert id="ast31" default="true">AST31</wert>
+      <wert id="ast31-el">AST31-EL</wert>
+    </gestelle>
+    <farben>
+      <wert id="lichtgrau">Lichtgrau</wert>
+      <wert id="weissaluminium" default="true">Weißaluminium</wert>
+    </farben>
+    <platten>
+      <wert id="buche">Buche</wert>
+      <wert id="weiss" default="true">Weiß</wert>
+    </platten>
+    <seitenblenden>
+      <wert id="ohne" default="true">ohne</wert>
+      <wert id="links">links</wert>
+      <wert id="rechts">rechts</wert>
+      <wert id="links-rechts">links + rechts</wert>
+    </seitenblenden>
+    <seitenfarben>
+      <wert id="gestell" default="true">Gestellfarbe</wert>
+      <wert id="blau">Blau</wert>
+      <wert id="anthrazit">Anthrazit</wert>
+    </seitenfarben>
+    <aufbauten>
+      <wert id="ohne">ohne</wert>
+      <wert id="niedrig" default="true">niedrig</wert>
+      <wert id="hoch">hoch</wert>
+    </aufbauten>
+    <bodenanzahl>
+    <wert id="0" default="true">keiner</wert>
+    <wert id="1">1 Boden</wert>
+    <wert id="2">2 Böden</wert>
+    <wert id="3">3 Böden</wert>
+    <wert id="4">4 Böden</wert>
+  </bodenanzahl>
+    <plattenanzahl>
+      <wert id="0">keine</wert>
+      <wert id="1" default="true">1 Platte</wert>
+      <wert id="2">2 Platten</wert>
+      <wert id="3">3 Platten</wert>
+    </plattenanzahl>
+    <containerpos>
+    <wert id="ohne" default="true">ohne</wert>
+    <wert id="links">links</wert>
+    <wert id="rechts">rechts</wert>
+    <wert id="links-rechts">links + rechts</wert>
+  </containerpos>
+
+  <containerfarben>
+    <wert id="gestell" default="true">Gestellfarbe</wert>
+    <wert id="blau">Enzianblau</wert>
+    <wert id="anthrazit">Anthrazit</wert>
+  </containerfarben>
+    
+  <laufschienenanzahl>
+    <wert id="0" default="true">keine</wert>
+    <wert id="1">1 Laufschiene</wert>
+    <wert id="2">2 Laufschienen</wert>
+  </laufschienenanzahl>  
+    
+  <ablagebordOptionen>
+  <wert id="ohne"  default="true">ohne</wert>
+  <wert id="buche">Buche</wert>
+  <wert id="weiss">Weiß</wert>
+</ablagebordOptionen>
+
+  </options>
+
+  <layers>
+    <!-- Hier beschreiben wir, welche Layer existieren und wie sie zusammengesetzt werden -->
+    <layer id="grundtisch" 
+        folder="grundtisch" 
+        keyPattern="{gestell}-{farbe}-{platte}-{breite}" 
+        offsetGroup="grundtische"
+    />
+    <layer id="seitenLinks" 
+        folder="seitenblenden" 
+        keyPattern="links-{seitenfarbe}" 
+        dependsOn="seitenblende:links|links-rechts" 
+        offsetGroup="seitenOffsets"
+    />
+    <layer id="seitenRechts" 
+        folder="seitenblenden" 
+        keyPattern="rechts-{seitenfarbe}" 
+        dependsOn="seitenblende:rechts|links-rechts" 
+        offsetGroup="seitenOffsets"
+    />
+    <!-- Aufbau: Säulen -->
+    <layer id="saeulen"
+           folder="aufbau"
+           keyPattern="saeulen-{aufbau}-{breite}"
+           dependsOn="aufbau:niedrig|hoch"
+           offsetGroup="saeulenOffsets"/>
+
+    <!-- Verstellbare Böden -->
+    <layer id="boden1" folder="verstellboden" keyPattern="boden-{farbe}-{breite}" dependsOn="bodenanzahl:1|2|3|4,aufbau:niedrig|hoch" offsetGroup="bodenOffsets"/>
+    <layer id="boden2" folder="verstellboden" keyPattern="boden-{farbe}-{breite}" dependsOn="bodenanzahl:2|3|4,aufbau:niedrig|hoch" offsetGroup="bodenOffsets"/>
+    <layer id="boden3" folder="verstellboden" keyPattern="boden-{farbe}-{breite}" dependsOn="bodenanzahl:3|4,aufbau:hoch" offsetGroup="bodenOffsets"/>
+    <layer id="boden4" folder="verstellboden" keyPattern="boden-{farbe}-{breite}" dependsOn="bodenanzahl:4,aufbau:hoch" offsetGroup="bodenOffsets"/>
+
+    <!-- Lochrasterplatten -->
+    <layer id="platte1" folder="aufbau" keyPattern="platte-{farbe}-{breite}" dependsOn="plattenanzahl:1|2|3,aufbau:niedrig|hoch" offsetGroup="plattenOffsets"/>
+    <layer id="platte2" folder="aufbau" keyPattern="platte-{farbe}-{breite}" dependsOn="plattenanzahl:2|3,aufbau:niedrig|hoch" offsetGroup="plattenOffsets"/>
+    <layer id="platte3" folder="aufbau" keyPattern="platte-{farbe}-{breite}" dependsOn="plattenanzahl:3,aufbau:hoch" offsetGroup="plattenOffsets"/>
+ <layer
+  id="ablagebord"
+  folder="ablagebord"
+  keyPattern="ablagebord-{ablagebord}-{breite}"
+  dependsOn="gestell:ast31,ablagebord:buche|weiss"
+  offsetGroup="ablagebordOffsets"
+/>
+
+    <layer id="containerLinks"
+         folder="container"
+         keyPattern="container-{farbe}-{containerfarbe}-{breite}"
+         dependsOn="containerpos:links|links-rechts"
+         offsetGroup="containerOffsets" />
+  <layer id="containerRechts"
+         folder="container"
+         keyPattern="container-{farbe}-{containerfarbe}-{breite}"
+         dependsOn="containerpos:rechts|links-rechts"
+         offsetGroup="containerOffsets" />
+   
+  <layer id="laufschiene1" 
+         folder="laufschienen" 
+         keyPattern="laufschiene1-{breite}" 
+         dependsOn="aufbau:hoch,laufschienenanzahl:1|2" 
+         offsetGroup="laufschienenOffsets"/>
+  <layer id="laufschiene2" 
+         folder="laufschienen" 
+         keyPattern="laufschiene2-{breite}" 
+         dependsOn="aufbau:hoch,laufschienenanzahl:2" 
+         offsetGroup="laufschienenOffsets"/>
+  </layers>
+
+  <offsets>
+    <grundtische>
+        <item id="ast31-lichtgrau-buche-750" x="150" y="500" scaleX="0.502" scaleY="0.5"/>
+        <item id="ast31-lichtgrau-buche-1500" x="151" y="500" scaleX="0.502" scaleY="0.5"/>
+        <item id="ast31-lichtgrau-buche-2000" x="150" y="500" scaleX="0.512" scaleY="0.5"/>
+        <item id="ast31-lichtgrau-weiss-750" x="150" y="500" scaleX="0.5" scaleY="0.5"/>
+        <item id="ast31-lichtgrau-weiss-1500" x="151" y="500" scaleX="0.5" scaleY="0.5"/>
+        <item id="ast31-lichtgrau-weiss-2000" x="150" y="500" scaleX="0.5" scaleY="0.5"/>
+        <item id="ast31-weissaluminium-buche-750" x="150" y="500" scaleX="0.502" scaleY="0.5"/>
+        <item id="ast31-weissaluminium-buche-1500" x="150" y="500" scaleX="0.502" scaleY="0.5"/>
+        <item id="ast31-weissaluminium-buche-2000" x="150" y="500" scaleX="0.512" scaleY="0.5"/>
+        <item id="ast31-weissaluminium-weiss-750" x="150" y="500" scaleX="0.5" scaleY="0.5"/>
+        <item id="ast31-weissaluminium-weiss-1500" x="150" y="500" scaleX="0.5" scaleY="0.5"/>
+        <item id="ast31-weissaluminium-weiss-2000" x="150" y="500" scaleX="0.5" scaleY="0.5"/>
+        <item id="ast31-el-weissaluminium-buche-750" x="154" y="499" scaleX="0.468" scaleY="0.4"/>
+        <item id="ast31-el-weissaluminium-buche-1500" x="150" y="500" scaleX="0.473" scaleY="0.45"/>
+        <item id="ast31-el-weissaluminium-buche-2000" x="150" y="500" scaleX="0.48" scaleY="0.48"/>
+        <item id="ast31-el-weissaluminium-weiss-750" x="156" y="499" scaleX="0.392" scaleY="0.4"/>
+        <item id="ast31-el-weissaluminium-weiss-1500" x="150" y="500" scaleX="0.473" scaleY="0.45"/>
+        <item id="ast31-el-weissaluminium-weiss-2000" x="150" y="500" scaleX="0.48" scaleY="0.48"/>
+
+    </grundtische>
+    <seitenOffsets>
+      <item breite="750" side="left" x="168" y="543" scaleX="0.375" scaleY="0.375"/>
+      <item breite="750" side="right" x="338" y="543" scaleX="0.375" scaleY="0.375"/>
+        
+      <item breite="1500" side="left" x="167" y="543" scaleX="0.38" scaleY="0.38"/>
+      <item breite="1500" side="right" x="553" y="544" scaleX="0.37" scaleY="0.37"/>
+        
+      <item breite="2000" side="left" x="167" y="543" scaleX="0.38" scaleY="0.38"/>
+      <item breite="2000" side="right" x="693" y="543" scaleX="0.38" scaleY="0.38"/>
+      <!-- usw. -->
+    </seitenOffsets>
+    <saeulenOffsets>
+      <item id="saeulen-niedrig-750" x="157" y="342" scaleX="0.495" scaleY="0.5"/>
+      <item id="saeulen-niedrig-1500" x="155" y="321" scaleX="0.518" scaleY="0.5"/>
+      <item id="saeulen-niedrig-2000" x="155" y="322" scaleX="0.528" scaleY="0.5"/>
+        
+      <item id="saeulen-hoch-750" x="157" y="200" scaleX="0.495" scaleY="0.5"/>
+      <item id="saeulen-hoch-1500" x="155" y="162" scaleX="0.518" scaleY="0.5"/>
+      <item id="saeulen-hoch-2000" x="155" y="162" scaleX="0.528" scaleY="0.5"/>
+    </saeulenOffsets>
+    <plattenOffsets>
+      <item id="platte1-750"  x="193" y="422" scaleX="0.342" scaleY="0.32"/>
+      <item id="platte1-1500" x="194" y="406" scaleX="0.515" scaleY="0.5"/>
+      <item id="platte1-2000" x="198" y="411" scaleX="0.528" scaleY="0.5"/>
+
+      <item id="platte2-750"  x="193" y="344" scaleX="0.342" scaleY="0.32"/>
+      <item id="platte2-1500" x="194" y="316" scaleX="0.515" scaleY="0.5"/>
+      <item id="platte2-2000" x="198" y="321" scaleX="0.528" scaleY="0.5"/>
+
+      <item id="platte3-750"  x="193" y="266" scaleX="0.342" scaleY="0.32"/>
+      <item id="platte3-1500" x="194" y="226" scaleX="0.515" scaleY="0.5"/>
+      <item id="platte3-2000" x="198" y="231" scaleX="0.528" scaleY="0.5"/>
+    </plattenOffsets>
+    <bodenOffsets>
+      <item id="boden1-750" x="183" y="393" scaleX="0.4" scaleY="0.4"/>
+      <item id="boden1-1500" x="183" y="376" scaleX="0.52" scaleY="0.5"/>
+      <item id="boden1-2000" x="184" y="376" scaleX="0.456" scaleY="0.456"/>
+
+      <item id="boden2-750" x="183" y="355" scaleX="0.4" scaleY="0.4"/>
+      <item id="boden2-1500" x="183" y="335" scaleX="0.52" scaleY="0.5"/>
+      <item id="boden2-2000" x="184" y="335" scaleX="0.456" scaleY="0.456"/>
+
+      <item id="boden3-750" x="183" y="310" scaleX="0.4" scaleY="0.4"/>
+      <item id="boden3-1500" x="183" y="285" scaleX="0.52" scaleY="0.5"/>
+      <item id="boden3-2000" x="184" y="285" scaleX="0.456" scaleY="0.456"/>
+
+      <item id="boden4-750" x="183" y="275" scaleX="0.4" scaleY="0.4"/>
+      <item id="boden4-1500" x="183" y="242" scaleX="0.52" scaleY="0.5"/>
+      <item id="boden4-2000" x="184" y="242" scaleX="0.456" scaleY="0.456"/>
+  </bodenOffsets>
+    <containerOffsets>
+    <!-- 750 mm: nur links/rechts -->
+    <item breite="750" side="left"  x="166" y="545" scaleX="0.25" scaleY="0.25"/>
+    <item breite="750" side="right" x="356" y="545" scaleX="0.25" scaleY="0.25"/>
+
+    <!-- 1500 mm: links/rechts/links+rechts -->
+    <item breite="1500" side="left"  x="166" y="545" scaleX="0.25" scaleY="0.25"/>
+    <item breite="1500" side="right" x="570" y="545" scaleX="0.25" scaleY="0.25"/>
+
+    <!-- 2000 mm: links/rechts/links+rechts -->
+    <item breite="2000" side="left"  x="166" y="545" scaleX="0.25" scaleY="0.25"/>
+    <item breite="2000" side="right" x="710" y="545" scaleX="0.25" scaleY="0.25"/>
+  </containerOffsets>
+  <laufschienenOffsets>
+    <item id="laufschiene1-750" x="167" y="218" scaleX="0.235" scaleY="0.235"/>
+    <item id="laufschiene2-750" x="159" y="213" scaleX="0.251" scaleY="0.251"/>
+    <item id="laufschiene1-1500" x="170" y="181" scaleX="0.251" scaleY="0.251"/>
+    <item id="laufschiene2-1500" x="161" y="175" scaleX="0.26" scaleY="0.26"/>
+    <item id="laufschiene1-2000" x="166" y="181" scaleX="0.24" scaleY="0.24"/>
+    <item id="laufschiene2-2000" x="157" y="175" scaleX="0.247" scaleY="0.247"/>
+  </laufschienenOffsets>
+    <ablagebordOffsets>
+  <item id="ablagebord-buche-750"  x="172" y="621" scaleX="0.445" scaleY="0.42"/>
+  <item id="ablagebord-buche-1500" x="168" y="620" scaleX="0.497" scaleY="0.50"/>
+  <item id="ablagebord-buche-2000" x="171" y="619" scaleX="0.5" scaleY="0.5"/>
+
+  <item id="ablagebord-weiss-750"  x="174" y="623" scaleX="0.38" scaleY="0.5"/>
+  <item id="ablagebord-weiss-1500" x="170" y="625" scaleX="0.497" scaleY="0.55"/>
+  <item id="ablagebord-weiss-2000" x="171" y="621" scaleX="0.53" scaleY="0.55"/>
+</ablagebordOffsets>
+
+  </offsets>
+</config>

@@ -1,0 +1,62 @@
+<articles>
+<!-- Grundtische -->
+<grundtisch key="ast31-lichtgrau-buche-750" number="403872"/>
+<grundtisch key="ast31-lichtgrau-buche-1500" number="403880"/>
+<grundtisch key="ast31-lichtgrau-buche-2000" number="403884"/>
+<grundtisch key="ast31-lichtgrau-weiss-750" number="403871"/>
+<grundtisch key="ast31-lichtgrau-weiss-1500" number="403879"/>
+<grundtisch key="ast31-lichtgrau-weiss-2000" number="403883"/>
+<grundtisch key="ast31-weissaluminium-buche-750" number="403874"/>
+<grundtisch key="ast31-weissaluminium-buche-1500" number="403882"/>
+<grundtisch key="ast31-weissaluminium-buche-2000" number="403886"/>
+<grundtisch key="ast31-weissaluminium-weiss-750" number="403873"/>
+<grundtisch key="ast31-weissaluminium-weiss-1500" number="403881"/>
+<grundtisch key="ast31-weissaluminium-weiss-2000" number="403885"/>
+<grundtisch key="ast31-el-weissaluminium-buche-750" number="403888"/>
+<grundtisch key="ast31-el-weissaluminium-buche-1500" number="403892"/>
+<grundtisch key="ast31-el-weissaluminium-buche-2000" number="403894"/>
+<grundtisch key="ast31-el-weissaluminium-weiss-750" number="403887"/>
+<grundtisch key="ast31-el-weissaluminium-weiss-1500" number="403891"/>
+<grundtisch key="ast31-el-weissaluminium-weiss-2000" number="403893"/>
+<!-- Seitenblenden (unabhängig von Breite, links/rechts identisch) -->
+<seitenblende key="lichtgrau" number="403818"/>
+<seitenblende key="weissaluminium" number="403820"/>
+<seitenblende key="anthrazit" number="403822"/>
+<seitenblende key="blau" number="403824"/>
+<!-- Aufbauten (nur hoch/niedrig, breitenunabhängig) -->
+<aufbau key="niedrig" number="403808"/>
+<aufbau key="hoch" number="403809"/>
+<!-- Böden -->
+<boden key="lichtgrau-750" number="402975"/>
+<boden key="lichtgrau-1500" number="402977"/>
+<boden key="lichtgrau-2000" number="402979"/>
+<boden key="weissaluminium-750" number="402976"/>
+<boden key="weissaluminium-1500" number="402978"/>
+<boden key="weissaluminium-2000" number="402980"/>
+<!-- Lochrasterplatten -->
+<platte key="lichtgrau-750" number="403810"/>
+<platte key="lichtgrau-1500" number="403812"/>
+<platte key="lichtgrau-2000" number="403813"/>
+<platte key="weissaluminium-750" number="403814"/>
+<platte key="weissaluminium-1500" number="403816"/>
+<platte key="weissaluminium-2000" number="403817"/>
+<!-- Container -->
+<container key="lichtgrau-lichtgrau" number="400001"/>
+<container key="lichtgrau-blau" number="400002"/>
+<container key="lichtgrau-anthrazit" number="400003"/>
+<container key="weissaluminium-weissaluminium" number="400004"/>
+<container key="weissaluminium-blau" number="400005"/>
+<container key="weissaluminium-anthrazit" number="400006"/>
+<!-- Laufschienen -->
+<laufschiene key="750" number="12345"/>
+<laufschiene key="1500" number="12345"/>
+<laufschiene key="2000" number="12345"/>
+<!-- Ablageborde -->
+<ablagebord key="buche-750"  number="404101"/>
+<ablagebord key="buche-1500" number="404102"/>
+<ablagebord key="buche-2000" number="404103"/>
+<ablagebord key="weiss-750"  number="404104"/>
+<ablagebord key="weiss-1500" number="404105"/>
+<ablagebord key="weiss-2000" number="404106"/>
+
+</articles>

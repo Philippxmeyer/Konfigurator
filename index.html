@@ -2,14 +2,37 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Konfigurator Minimalbeispiel</title>
+  <title>AST31-Konfigurator</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.png">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 </head>
 <body>
-<div class="app">
-  <div id="preview"></div>
-  <div class="sidebar" id="sidebar"></div>
-</div>
-<script src="script.js"></script>
+  
+  <!-- Logo oben links -->
+  <div id="logo-container">
+    <img src="bilder/Logo_betriebseinrichtungen_4c.svg" alt="Logo Betriebseinrichtungen">
+  </div>
+  
+  <div class="app">
+    <div id="preview">
+      <div id="stage"></div>
+    </div>
+    <!-- Artikelliste -->
+  <div class="sidebar" id="article-list">
+    <div class="section">
+      <h2>Artikelliste</h2>
+      <div class="content">
+        <ul id="articleItems"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Konfigurator -->
+    <div class="sidebar" id="sidebar"></div>
+  </div>
+
+  <!-- Einstiegspunkt ins modulare Setup -->
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
