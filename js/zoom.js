@@ -1,17 +1,9 @@
 // zoom.js
-let zoomLevel = 1;
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 2.5;
 const WHEEL_STEP = 0.1;
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-
-function applyTransform(stage, zoom, originPct = null) {
-  if (originPct) {
-    stage.style.transformOrigin = `${originPct.xPct}% ${originPct.yPct}%`;
-  }
-  stage.style.transform = `scale(${zoom})`;
-}
 
 function clientToStagePercent(stage, clientX, clientY) {
   const r = stage.getBoundingClientRect();
@@ -24,6 +16,34 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
   const container = document.getElementById(previewId);
   const stage = document.getElementById(stageId);
   if (!container || !stage) return;
+
+  const stageBaseWidth = stage.offsetWidth || 1;
+  const stageBaseHeight = stage.offsetHeight || 1;
+  let zoomLevel = 1;
+  let baseScale = 1;
+
+  const applyTransform = (originPct = null) => {
+    if (originPct) {
+      stage.style.transformOrigin = `${originPct.xPct}% ${originPct.yPct}%`;
+    }
+    const scale = baseScale * zoomLevel;
+    stage.style.transform = `scale(${scale})`;
+  };
+
+  const updateBaseScale = () => {
+    const availableWidth = container.clientWidth;
+    const availableHeight = container.clientHeight;
+    if (!availableWidth) return;
+
+    const widthScale = availableWidth / stageBaseWidth;
+    const heightScale = availableHeight ? availableHeight / stageBaseHeight : widthScale;
+    const newBase = Math.min(1, widthScale, heightScale);
+
+    baseScale = newBase > 0 ? newBase : 1;
+    zoomLevel = clamp(zoomLevel, MIN_ZOOM, MAX_ZOOM);
+
+    applyTransform({ xPct: 50, yPct: 50 });
+  };
 
   // --- Wheel: Zoom um Mauszeiger ---
   container.addEventListener(
@@ -42,7 +62,7 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
       zoomLevel += dir > 0 ? -step : step;
       zoomLevel = clamp(zoomLevel, MIN_ZOOM, MAX_ZOOM);
 
-      applyTransform(stage, zoomLevel, originPct);
+      applyTransform(originPct);
     },
     { passive: false }
   );
@@ -50,7 +70,7 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
   // Doppelklick / -tipp = Reset
   container.addEventListener("dblclick", () => {
     zoomLevel = 1;
-    applyTransform(stage, zoomLevel, { xPct: 50, yPct: 50 });
+    applyTransform({ xPct: 50, yPct: 50 });
   });
 
   // --- Touch: Pinch-to-Zoom ---
@@ -80,7 +100,7 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
 
         const center = getTouchCenter(e.touches[0], e.touches[1]);
         const originPct = clientToStagePercent(stage, center.x, center.y);
-        applyTransform(stage, zoomLevel, originPct);
+        applyTransform(originPct);
 
         e.preventDefault();
       }
@@ -99,7 +119,7 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
 
           const center = getTouchCenter(e.touches[0], e.touches[1]);
           const originPct = clientToStagePercent(stage, center.x, center.y);
-          applyTransform(stage, zoomLevel, originPct);
+          applyTransform(originPct);
         }
         e.preventDefault();
       }
@@ -110,7 +130,7 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
   container.addEventListener("touchend", () => {
     if (pinchActive) {
       zoomLevel = clamp(zoomLevel, MIN_ZOOM, MAX_ZOOM);
-      applyTransform(stage, zoomLevel);
+      applyTransform();
       // optional haptisches Feedback (falls vorhanden)
       if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
         // navigator.vibrate(5);
@@ -119,6 +139,12 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
     pinchActive = false;
   });
 
-  // Initial
-  applyTransform(stage, zoomLevel, { xPct: 50, yPct: 50 });
+  window.addEventListener("resize", updateBaseScale);
+
+  if (typeof ResizeObserver !== "undefined") {
+    const observer = new ResizeObserver(updateBaseScale);
+    observer.observe(container);
+  }
+
+  updateBaseScale();
 }
