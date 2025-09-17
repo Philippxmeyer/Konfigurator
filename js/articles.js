@@ -93,20 +93,28 @@ if (values.ablagebord && values.ablagebord !== "ohne") {
   }
 }
 
-// --- Rendern (Listenelemente klickbar) ---
-const BASE = "https://www.schaefer-shop.de/product/search?query=";
+  // --- Rendern (Listenelemente klickbar) ---
+  const BASE = "https://www.schaefer-shop.de/product/search?query=";
 
-items.forEach(item => {
-  const li = document.createElement("li");
+  if (items.length === 0) {
+    const empty = document.createElement("li");
+    empty.className = "article-overlay__empty";
+    empty.textContent = "Keine Artikeldaten verfügbar.";
+    list.appendChild(empty);
+    return;
+  }
 
-  const a = document.createElement("a");
-  a.className = "article-link";
-  a.href = BASE + encodeURIComponent(item.code);
-  a.target = "_blank";
-  a.rel = "noopener noreferrer";
-  a.innerHTML = `<strong>${item.label}</strong><br><span class="code">${item.code}</span>`;
+  items.forEach(item => {
+    const li = document.createElement("li");
 
-  li.appendChild(a);
-  list.appendChild(li);
-});
+    const a = document.createElement("a");
+    a.className = "article-link";
+    a.href = BASE + encodeURIComponent(item.code);
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.innerHTML = `<strong>${item.label}</strong><br><span class="code">${item.code}</span>`;
+
+    li.appendChild(a);
+    list.appendChild(li);
+  });
 }
