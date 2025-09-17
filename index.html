@@ -18,18 +18,46 @@
     <div id="preview">
       <div id="stage"></div>
     </div>
-    <!-- Artikelliste -->
-  <div class="sidebar" id="article-list">
-    <div class="section">
-      <h2>Artikelliste</h2>
-      <div class="content">
-        <ul id="articleItems"></ul>
-      </div>
+    <div class="sidebar-container">
+      <button
+        id="articleListTrigger"
+        class="btn overlay-trigger"
+        type="button"
+        aria-haspopup="dialog"
+        aria-expanded="false"
+        aria-controls="articleOverlay"
+      >
+        Artikelliste &amp; Teilen
+      </button>
+      <div class="sidebar" id="sidebar"></div>
     </div>
   </div>
 
-  <!-- Konfigurator -->
-    <div class="sidebar" id="sidebar"></div>
+  <div id="articleOverlay" class="article-overlay" aria-hidden="true">
+    <div
+      class="article-overlay__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="articleOverlayTitle"
+    >
+      <header class="article-overlay__header">
+        <h2 id="articleOverlayTitle">Artikelliste</h2>
+        <button
+          type="button"
+          class="btn btn--icon article-overlay__close"
+          data-overlay-close
+          aria-label="Artikelliste schließen"
+        >
+          ✕
+        </button>
+      </header>
+      <div class="article-overlay__body">
+        <div class="article-overlay__list-wrapper">
+          <ul id="articleItems" class="article-overlay__list"></ul>
+        </div>
+        <div id="articleOverlayShare" class="article-overlay__share"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Einstiegspunkt ins modulare Setup -->

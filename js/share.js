@@ -42,36 +42,43 @@ export function updateURL(values) {
   const newURL = `${window.location.pathname}?${params.toString()}`;
   window.history.replaceState({}, "", newURL);
 
-  let linkBox = document.getElementById("share-link");
-  if (!linkBox) {
-    linkBox = document.createElement("div");
-    linkBox.id = "share-link";
-    linkBox.className = "section";
-    linkBox.innerHTML = `
-      <h2>Teilen</h2>
-      <div class="content">
-        <div class="share-container">
-          <input type="text" id="shareInput" readonly>
-          <button id="copyBtn" title="Kopieren">📋</button>
-        </div>
+  const shareRoot = document.getElementById("articleOverlayShare");
+  if (!shareRoot) return;
+
+  if (!shareRoot.querySelector("#shareInput")) {
+    shareRoot.innerHTML = `
+      <h3>Konfiguration teilen</h3>
+      <div class="share-container">
+        <input type="text" id="shareInput" readonly>
+        <button id="copyBtn" class="btn btn--icon" type="button" title="Kopieren">📋</button>
       </div>
     `;
-    document.getElementById("article-list").appendChild(linkBox);
 
-    // Copy-Logik
-    linkBox.querySelector("#copyBtn").addEventListener("click", () => {
-      const input = document.getElementById("shareInput");
+    const copyBtn = shareRoot.querySelector("#copyBtn");
+    copyBtn.addEventListener("click", async () => {
+      const input = shareRoot.querySelector("#shareInput");
+      input.focus();
       input.select();
-      document.execCommand("copy");
-      // kleines Feedback
-      const oldText = linkBox.querySelector("#copyBtn").textContent;
-      linkBox.querySelector("#copyBtn").textContent = "✅";
+      input.setSelectionRange(0, input.value.length);
+
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(input.value);
+        } else {
+          document.execCommand("copy");
+        }
+      } catch (err) {
+        document.execCommand("copy");
+      }
+
+      const oldText = copyBtn.textContent;
+      copyBtn.textContent = "✅";
+      copyBtn.focus();
       setTimeout(() => {
-        linkBox.querySelector("#copyBtn").textContent = oldText;
+        copyBtn.textContent = oldText;
       }, 1000);
     });
   }
 
-  // URL ins Input schreiben
-  linkBox.querySelector("#shareInput").value = window.location.origin + newURL;
+  shareRoot.querySelector("#shareInput").value = window.location.origin + newURL;
 }
