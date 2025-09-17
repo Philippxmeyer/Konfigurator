@@ -102,12 +102,18 @@ button {
   min-height: 0;
 }
 
-#articleListTrigger {
-  margin: 0;
-  align-self: stretch;
+.sidebar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   position: sticky;
   top: 20px;
   z-index: 10;
+}
+
+#articleListTrigger {
+  margin: 0;
+  flex: 1;
   font-weight: 700;
   font-size: 0.95rem;
   text-align: center;
@@ -117,6 +123,17 @@ button {
   color: #ffffff; */
   box-shadow: 0 18px 34px -20px rgba(37, 99, 235, 0.75);
   border-radius: 12px;
+}
+
+.sidebar-actions__help {
+  font-size: 1.2rem;
+  line-height: 1;
+  color: rgba(30, 41, 59, 0.85);
+  box-shadow: 0 12px 24px -18px rgba(15, 23, 42, 0.45);
+}
+
+.sidebar-actions__help:hover {
+  color: #1d4ed8;
 }
 
 .overlay-trigger:hover {
@@ -377,6 +394,39 @@ select:focus-visible {
   flex: 1;
   overflow: hidden;
   background: linear-gradient(135deg, rgba(250, 252, 255, 0.95), rgba(236, 239, 246, 0.95));
+}
+
+.help-overlay__body {
+  gap: 18px;
+}
+
+.help-overlay__intro {
+  margin: 0;
+  font-size: 1rem;
+  color: rgba(30, 41, 59, 0.85);
+}
+
+.help-overlay__steps {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: rgba(30, 41, 59, 0.95);
+}
+
+.help-overlay__steps li {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 16px 30px -28px rgba(15, 23, 42, 0.55);
+}
+
+.help-overlay__steps strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #1d4ed8;
+  font-size: 1.02rem;
 }
 
 .article-overlay__list-wrapper {
