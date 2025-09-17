@@ -172,12 +172,12 @@
    
   <layer id="laufschiene1" 
          folder="laufschienen" 
-         keyPattern="laufschiene-{breite}" 
+         keyPattern="laufschiene1-{breite}" 
          dependsOn="aufbau:hoch,laufschienenanzahl:1|2" 
          offsetGroup="laufschienenOffsets"/>
   <layer id="laufschiene2" 
          folder="laufschienen" 
-         keyPattern="laufschiene-{breite}" 
+         keyPattern="laufschiene2-{breite}" 
          dependsOn="aufbau:hoch,laufschienenanzahl:2" 
          offsetGroup="laufschienenOffsets"/>
   </layers>
