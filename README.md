@@ -1,77 +1,118 @@
 # 🛠️ Arbeitstisch-Konfigurator 3000™
 
-Willkommen im vermutlich **weltweit einzigen** Arbeitstisch-Konfigurator,
-bei dem nicht nur Tabellen, sondern auch echte Bilder ineinander geschoben werden.  
-(Nein, es gibt keine Drag&Drop-Magie. Das hier ist die ehrliche Handwerksversion 💪)
+Der Arbeitstisch-Konfigurator 3000™ ist ein vollständig clientseitiger Produktkonfigurator für modulare Arbeitstische. Alle Auswahlmöglichkeiten, Berechnungen und Layer-Bilder werden aus strukturierten XML-Dateien geladen und ohne zusätzliche Build- oder Server-Infrastruktur im Browser gerendert.
 
 ---
 
-## 🎯 Features
-
-- **XML first!**  
-  Alle Optionen, Layer und Offsets werden aus einer `config.xml` geladen.  
-  Wenn du irgendwann statt Arbeitstischen Einhörner konfigurieren willst → einfach XML tauschen.
-
-- **Dynamische Sidebar**  
-  HTML ist faul. Alles in der Sidebar baut sich automatisch aus der XML auf.  
-  Du musst nie wieder `<option>`s tippen wie ein Praktikant.  
-
-- **Bilder-Overlays**  
-  Kein 3D, kein WebGL, kein Metaverse.  
-  Einfach PNGs übereinander wie in Photoshop 1999 – und trotzdem sexy.  
-
-- **Eyecandy™**  
-  Smooth-Fades und ein Akkordeon-Menü. Weil Konfigurieren ohne Animationen einfach traurig ist.  
+## Inhaltsverzeichnis
+- [Überblick](#überblick)
+- [Highlights](#highlights)
+- [Technologie-Stack](#technologie-stack)
+- [Schnellstart](#schnellstart)
+- [Bedienung](#bedienung)
+- [Konfiguration anpassen](#konfiguration-anpassen)
+  - [Konfigurations-XML (`config.xml`)](#konfigurations-xml-configxml)
+  - [Artikelnummern (`article-list.xml`)](#artikelnummern-article-listxml)
+  - [Bild-Assets](#bild-assets)
+- [Projektstruktur](#projektstruktur)
+- [Roadmap & bekannte Themen](#roadmap--bekannte-themen)
+- [Mitmachen](#mitmachen)
+- [Lizenz](#lizenz)
 
 ---
 
-## 📂 Projektstruktur
+## Überblick
+- **Zielgruppe:** Vertrieb & Marketing, um Varianten eines Arbeitstischsystems schnell visualisieren und teilen zu können.
+- **Ansatz:** XML-first. Sämtliche UI-Elemente werden dynamisch aus der Konfiguration erzeugt, wodurch sich neue Produktlinien ohne Codeänderungen integrieren lassen.
+- **Ausgabe:** Eine gestapelte Vorschau aus PNG-Layern sowie eine Artikelliste mit Artikelnummern und einer Teilen-Funktion.
 
-arbeitstisch-konfigurator/
-├── index.html # Einstiegspunkt, minimalistisch wie ein IKEA-Regal
-├── style.css # Macht das Ganze hübsch
-├── script.js # Bringt Leben rein
-├── config.xml # Herzstück mit allen Optionen, Offsets & Layern
-├── bilder/ # Deine Assets, sortiert nach Ordnern
-│ ├── grundtisch/
-│ ├── seitenblenden/
-│ └── aufbau/
-└── README.md # Genau das, was du gerade liest
+## Highlights
+- **Dynamische Sidebar:** Gruppen, Sektionen und Auswahlfelder entstehen vollständig aus der `config.xml`. HTML muss nicht angepasst werden.
+- **Layer-basierte Darstellung:** Jedes Produktmerkmal blendet eigene PNGs ein, die über Offsets exakt positioniert werden.
+- **Artikelliste & Sharing:** Ein Overlay zeigt die aktuell gewählten Artikelnummern, erstellt einen kompakten Teilen-Link und bietet eine Kopierfunktion.
+- **Zoom & Barrierefreiheit:** Der Vorschaubereich lässt sich zoomen, Overlay und Buttons sind per Tastatur steuerbar.
+- **Zero-Dependencies:** Kein Build-Step, kein Framework. Eine statische Auslieferung genügt (z. B. GitHub Pages).
 
-yaml
-Code kopieren
+## Technologie-Stack
+- **HTML/CSS** für die Oberfläche und Animationen.
+- **Vanilla JavaScript** (ES Modules) für Logik, Rendering und Teilen-Funktion.
+- **XML** als Datenquelle für Produktgruppen, Optionen, Offsets und Artikelnummern.
 
----
-
-## 🚀 Wie starten?
-
-1. Repo klonen:
+## Schnellstart
+1. Repository klonen:
    ```bash
    git clone https://github.com/deinuser/arbeitstisch-konfigurator.git
    cd arbeitstisch-konfigurator
-Öffne index.html im Browser.
-(Ja, so einfach. Kein NPM, keine 4000 Dependencies, kein Webpack-Albtraum.)
+   ```
+2. Projekt im Browser öffnen:
+   - Entweder `index.html` direkt öffnen (für lokale Vorschau), oder
+   - Einen kleinen Static-Server starten, z. B. mit Python:
+     ```bash
+     python3 -m http.server 8000
+     ```
+     und anschließend `http://localhost:8000` aufrufen. Dies ist notwendig, wenn `fetch`-Aufrufe (z. B. für die Artikel-Liste) vom Browser blockiert werden.
+3. Optional: Für die Veröffentlichung einfach auf GitHub Pages oder jeden beliebigen statischen Hoster deployen.
 
-Wenn du cool wirken willst: GitHub Pages aktivieren.
-Dann läuft dein Konfigurator unter
-https://deinuser.github.io/arbeitstisch-konfigurator/
-(und alle halten dich für einen echten Web-Guru).
+## Bedienung
+1. Auf der linken Seite Parameter (Breite, Gestell, Aufbau, …) auswählen. Standardwerte kommen aus der `config.xml`.
+2. Die Vorschau rechts aktualisiert sich sofort und stapelt die passenden PNG-Layer.
+3. Über den Button **„Artikelliste & Teilen“** öffnet sich ein Overlay mit:
+   - allen ausgewählten Komponenten inkl. Artikelnummer,
+   - einem generierten Teilen-Link (`?config=…`), der per Klick in die Zwischenablage kopiert wird.
+4. Der Zoom im Vorschaubereich lässt sich per Mausrad oder Touch-Gesten bedienen (sofern unterstützt).
 
-## 📝 ToDos
- Seitenblenden-Offsets für alle Breiten feintunen (Pixel-Feilschen ist Kunst).
+## Konfiguration anpassen
 
- Bilder für „Aufbau hoch“ rendern.
+### Konfigurations-XML (`config.xml`)
+- **`<groups>`**: Definiert Sidebar-Gruppen und deren Sections.
+- **`<options>`**: Hinterlegt die auswählbaren Werte (`<wert>`) inklusive optionaler Defaults.
+- **`<layers>`**: Ordnet den Optionen Bildpfade, Layer-Reihenfolge und Offsets zu.
+- **`<overlays>` / `<offsets>`** (siehe Datei): Regeln, welche Layer ein- oder ausgeblendet werden und wie sie verschoben werden.
 
- XML mal so umbauen, dass man auch Schränke oder Kaffeemaschinen konfigurieren kann.
+Änderungen an den IDs wirken sich direkt auf die erzeugten `<select>`-Felder aus. Neue Produkte werden in `config.xml` ergänzt, ohne dass am JavaScript-Code gearbeitet werden muss.
 
- Konami-Code einbauen (↑ ↑ ↓ ↓ ← → ← → B A → Easter Egg?).
+### Artikelnummern (`article-list.xml`)
+- Enthält Artikelnummern für Breiten, Platten, Aufbauten usw.
+- Die `lookupArticle`-Funktion weist jeder Auswahl im Overlay die passende Nummer zu.
+- Struktur: `<articles><breite key="750" number="…" /> …</articles>` – Keys müssen mit den Option-IDs in `config.xml` übereinstimmen.
 
-## 🤝 Contributing
-Pull Requests sind willkommen!
-Wenn du Codex bist: Willkommen im Projekt, mach’s bitte nicht kaputt.
+### Bild-Assets
+- Alle Renderings liegen im Ordner `bilder/` und sind nach Layern gruppiert (z. B. `grundtisch/`, `seitenblenden/`, `aufbau/`).
+- PNGs sollten transparente Hintergründe haben und exakt zur im `layers`-Abschnitt beschriebenen Größe passen.
+- Neue Layer erfordern:
+  1. Eintragen in `config.xml` (`<layer id="…" folder="…" file="…" />`).
+  2. Ablegen der Bilddateien im passenden Unterordner.
+  3. Optionales Justieren von Offsets in `offsets.js`, wenn spezielle Verschiebungen nötig sind.
 
-## 🐛 Bugs?
-Es gibt keine Bugs, nur „ungeplante Features“.
-Wenn dir doch einer auffällt → Issue aufmachen und tief seufzen.
+## Projektstruktur
+```text
+arbeitstisch-konfigurator/
+├── index.html          # Einstiegspunkt, bindet alle Module ein
+├── style.css           # Styles & Animationen
+├── js/                 # ES-Module für Logik, UI und Preview
+│   ├── main.js         # Initialisierung & App-Lifecycle
+│   ├── configLoader.js # Lädt und cached config.xml
+│   ├── uiBuilder.js    # Erzeugt Sidebar & Formularfelder
+│   ├── preview.js      # Aktualisiert Layer-Bilder
+│   ├── offsets.js      # Berechnet Verschiebungen einzelner Layer
+│   ├── share.js        # Teilen-Link erzeugen & URL aktualisieren
+│   ├── articleLoader.js# Artikelnummern aus article-list.xml laden
+│   └── ...             # Weitere Module (Zoom, Business-Logik, …)
+├── config.xml          # Produktkonfiguration & Layer-Zuordnung
+├── article-list.xml    # Artikeldatenbank für das Overlay
+├── bilder/             # Sämtliche PNG-Layer
+├── favicon.png
+└── README.md
+```
 
-Viel Spaß beim Konfigurieren! 🎉
+## Roadmap & bekannte Themen
+- Offsets der Seitenblenden für alle Breiten weiter verfeinern.
+- Zusätzliche Renderings für „Aufbau hoch“ ergänzen.
+- `config.xml` für weitere Produktfamilien (z. B. Schränke, Kaffeemaschinen) generalisieren.
+- Bonus-Idee: Ein optionales Easter-Egg via Konami-Code 🎮
+
+## Mitmachen
+Pull Requests sind willkommen! Bitte achte auf verständliche Commits und teste deine Änderungen in allen gängigen Browsern. Wenn du Fragen zur Struktur hast, melde dich gern über Issues.
+
+## Lizenz
+Dieses Projekt steht unter der MIT-Lizenz. Details siehe [`LICENSE`](LICENSE).
