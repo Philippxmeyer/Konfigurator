@@ -87,6 +87,8 @@ export function updatePreview(configXML, images) {
     if (offsetGroup) {
       if (targetId.startsWith("boden") || targetId.startsWith("platte")) {
         cfg = parseOffset(configXML, `offsets > ${offsetGroup} > item[id="${targetId}-${values.breite}"]`);
+      } else if (targetId.startsWith("laufschiene")) {
+        cfg = parseOffset(configXML, `offsets > ${offsetGroup} > item[id="${targetId}-${values.breite}"]`);
       } else if (targetId === "seitenLinks" || targetId === "seitenRechts" ||
                  targetId === "containerLinks" || targetId === "containerRechts") {
         const side = targetId.endsWith("Links") ? "left" : "right";
