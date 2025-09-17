@@ -18,22 +18,18 @@
     <div id="preview">
       <div id="stage"></div>
     </div>
-
-    <!-- Konfigurator -->
-    <div class="sidebar" id="sidebar">
-      <div class="sidebar-controls">
-        <button type="button" id="openArticleOverlay" class="article-overlay-toggle">Artikelliste anzeigen</button>
+    <!-- Artikelliste -->
+  <div class="sidebar" id="article-list">
+    <div class="section">
+      <h2>Artikelliste</h2>
+      <div class="content">
+        <ul id="articleItems"></ul>
       </div>
-      <div id="sidebarContent"></div>
     </div>
   </div>
 
-  <div id="articleOverlay" class="article-overlay" aria-hidden="true">
-    <div class="article-overlay__panel" role="dialog" aria-modal="true" aria-labelledby="articleOverlayTitle">
-      <button type="button" id="closeArticleOverlay" class="article-overlay__close" aria-label="Artikelliste schließen">×</button>
-      <h2 id="articleOverlayTitle">Artikelliste</h2>
-      <ul id="articleItems"></ul>
-    </div>
+  <!-- Konfigurator -->
+    <div class="sidebar" id="sidebar"></div>
   </div>
 
   <!-- Einstiegspunkt ins modulare Setup -->
