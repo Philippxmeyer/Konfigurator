@@ -19,16 +19,29 @@
       <div id="stage"></div>
     </div>
     <div class="sidebar-container">
-      <button
-        id="articleListTrigger"
-        class="btn overlay-trigger"
-        type="button"
-        aria-haspopup="dialog"
-        aria-expanded="false"
-        aria-controls="articleOverlay"
-      >
-        Artikelliste
-      </button>
+      <div class="sidebar-actions">
+        <button
+          id="articleListTrigger"
+          class="btn overlay-trigger"
+          type="button"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="articleOverlay"
+        >
+          Artikelliste
+        </button>
+        <button
+          id="helpOverlayTrigger"
+          class="btn btn--icon overlay-trigger sidebar-actions__help"
+          type="button"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="helpOverlay"
+          aria-label="Hilfe"
+        >
+          ?
+        </button>
+      </div>
       <div class="sidebar" id="sidebar"></div>
     </div>
   </div>
@@ -56,6 +69,46 @@
           <ul id="articleItems" class="article-overlay__list"></ul>
         </div>
         <div id="articleOverlayShare" class="article-overlay__share"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="helpOverlay" class="article-overlay" aria-hidden="true">
+    <div
+      class="article-overlay__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="helpOverlayTitle"
+    >
+      <header class="article-overlay__header">
+        <h2 id="helpOverlayTitle">So funktioniert der Konfigurator</h2>
+        <button
+          type="button"
+          class="btn btn--icon article-overlay__close"
+          data-overlay-close
+          aria-label="Hilfe schließen"
+        >
+          ✕
+        </button>
+      </header>
+      <div class="article-overlay__body help-overlay__body">
+        <p class="help-overlay__intro">
+          Stellen Sie Ihren AST31 in wenigen Schritten zusammen. Folgen Sie der empfohlenen Reihenfolge und nutzen Sie anschließend die Artikelliste.
+        </p>
+        <ol class="help-overlay__steps">
+          <li>
+            <strong>Grundtisch auswählen:</strong> Wählen Sie eine der zwei Gestellvarianten, eine der drei Breiten sowie eine der zwei Platten und ergänzen Sie bei Bedarf Seitenblenden.
+          </li>
+          <li>
+            <strong>Aufbauvariante festlegen:</strong> Entscheiden Sie sich für eine Aufbauvariante und wählen Sie die passenden Aufbauelemente.
+          </li>
+          <li>
+            <strong>Unterbau wählen:</strong> Fügen Sie Container oder ein Ablagebord hinzu.
+          </li>
+          <li>
+            <strong>Artikelliste öffnen:</strong> Klicken Sie auf die Artikelliste, um Komponenten direkt zu bestellen oder über den Share-Link eine unverbindliche Anfrage an den Schäfer Shop zu senden.
+          </li>
+        </ol>
       </div>
     </div>
   </div>

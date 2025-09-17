@@ -8,9 +8,9 @@ import { initPreviewZoom } from "./zoom.js";
 
 let configXML;
 const images = {};
-function setupArticleOverlay() {
-  const overlay = document.getElementById("articleOverlay");
-  const trigger = document.getElementById("articleListTrigger");
+function setupOverlay(triggerId, overlayId) {
+  const overlay = document.getElementById(overlayId);
+  const trigger = document.getElementById(triggerId);
   if (!overlay || !trigger) return;
 
   const closeButton = overlay.querySelector("[data-overlay-close]");
@@ -32,7 +32,9 @@ function setupArticleOverlay() {
     if (!overlay.classList.contains("is-open")) return;
     overlay.classList.remove("is-open");
     overlay.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("overlay-open");
+    if (!document.querySelector(".article-overlay.is-open")) {
+      document.body.classList.remove("overlay-open");
+    }
     trigger.setAttribute("aria-expanded", "false");
     if (lastFocusedElement) {
       lastFocusedElement.focus();
@@ -84,7 +86,8 @@ function loadFromURL() {
 }
 
 async function init() {
-  setupArticleOverlay();
+  setupOverlay("articleListTrigger", "articleOverlay");
+  setupOverlay("helpOverlayTrigger", "helpOverlay");
 
   // 1) Konfiguration & Artikelliste laden
   configXML = await loadConfig();
