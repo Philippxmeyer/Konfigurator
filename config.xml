@@ -153,25 +153,22 @@
     <!-- Laufschienen -->
     <layer id="laufschiene1" folder="laufschienen" keyPattern="laufschiene-{breite}" dependsOn="aufbau:hoch,laufschienenanzahl:1|2" offsetGroup="laufschienenOffsets"/>
     <layer id="laufschiene2" folder="laufschienen" keyPattern="laufschiene-{breite}" dependsOn="aufbau:hoch,laufschienenanzahl:2" offsetGroup="laufschienenOffsets"/>
-  </layers>
- <layer
-  id="ablagebord"
-  folder="ablagebord"
-  keyPattern="ablagebord-{ablagebord}-{breite}"
-  dependsOn="gestell:ast31,ablagebord:buche|weiss"
-  offsetGroup="ablagebordOffsets"
-/>
-
+    <layer id="ablagebord"
+           folder="ablagebord"
+           keyPattern="ablagebord-{ablagebord}-{breite}"
+           dependsOn="gestell:ast31,ablagebord:buche|weiss"
+           offsetGroup="ablagebordOffsets"/>
     <layer id="containerLinks"
-         folder="container"
-         keyPattern="container-{farbe}-{containerfarbe}-{breite}"
-         dependsOn="containerpos:links|links-rechts"
-         offsetGroup="containerOffsets" />
-  <layer id="containerRechts"
-         folder="container"
-         keyPattern="container-{farbe}-{containerfarbe}-{breite}"
-         dependsOn="containerpos:rechts|links-rechts"
-         offsetGroup="containerOffsets" />
+           folder="container"
+           keyPattern="container-{farbe}-{containerfarbe}-{breite}"
+           dependsOn="containerpos:links|links-rechts"
+           offsetGroup="containerOffsets"/>
+    <layer id="containerRechts"
+           folder="container"
+           keyPattern="container-{farbe}-{containerfarbe}-{breite}"
+           dependsOn="containerpos:rechts|links-rechts"
+           offsetGroup="containerOffsets"/>
+  </layers>
 
   <offsets>
     <grundtische>
