@@ -112,7 +112,37 @@ if (values.ablagebord && values.ablagebord !== "ohne") {
     a.href = BASE + encodeURIComponent(item.code);
     a.target = "_blank";
     a.rel = "noopener noreferrer";
-    a.innerHTML = `<span class="article-link-header">${item.label}</span><span class="code">${item.code}</span>`;
+
+    const thumb = document.createElement("span");
+    thumb.className = "article-link__thumb";
+
+    const image = document.createElement("img");
+    image.className = "article-link__image";
+    image.src = `bilder/icons/${item.code}.png`;
+    image.alt = `${item.label} (${item.code})`;
+    image.loading = "lazy";
+    image.addEventListener("error", () => {
+      thumb.classList.add("article-link__thumb--hidden");
+    });
+
+    thumb.appendChild(image);
+
+    const content = document.createElement("span");
+    content.className = "article-link__content";
+
+    const header = document.createElement("span");
+    header.className = "article-link-header";
+    header.textContent = item.label;
+
+    const code = document.createElement("span");
+    code.className = "code";
+    code.textContent = item.code;
+
+    content.appendChild(header);
+    content.appendChild(code);
+
+    a.appendChild(thumb);
+    a.appendChild(content);
 
     li.appendChild(a);
     list.appendChild(li);
