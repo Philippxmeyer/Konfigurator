@@ -8,6 +8,8 @@ import { initPreviewZoom } from "./zoom.js";
 
 let configXML;
 const images = {};
+let resizeTimeoutId;
+const RESIZE_DEBOUNCE = 150;
 
 /**
  * Liest ?config=… aus der URL, decodiert die Werte und schreibt sie in die Selects.
@@ -56,6 +58,11 @@ async function init() {
 
   // 6) Erste Darstellung
   updatePreview(configXML, images);
+
+  window.addEventListener("resize", () => {
+    window.clearTimeout(resizeTimeoutId);
+    resizeTimeoutId = window.setTimeout(() => updatePreview(configXML, images), RESIZE_DEBOUNCE);
+  });
 }
 
 function setupArticleOverlay() {
