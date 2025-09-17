@@ -19,22 +19,15 @@ export function fadeIn(img, src) {
   };
 }
 
-export function placeImage(img, src, cfg, stageScale = 1) {
+export function placeImage(img, src, cfg) {
   if (!cfg) {
     img.style.display = "none";
     return;
   }
-
-  const effectiveScale = Number.isFinite(stageScale) && stageScale > 0 ? stageScale : 1;
-  const scaledX = (cfg.x ?? 0) * effectiveScale;
-  const scaledY = (cfg.y ?? 0) * effectiveScale;
-  const scaledScaleX = (cfg.scaleX ?? 1) * effectiveScale;
-  const scaledScaleY = (cfg.scaleY ?? 1) * effectiveScale;
-
   fadeIn(img, src);
-  img.style.left = `${scaledX}px`;
-  img.style.top = `${scaledY}px`;
-  img.style.transform = `scale(${scaledScaleX}, ${scaledScaleY})`;
+  img.style.left = cfg.x + "px";
+  img.style.top = cfg.y + "px";
+  img.style.transform = `scale(${cfg.scaleX}, ${cfg.scaleY})`;
   img.style.transformOrigin = "top left";
   img.style.display = "block";
 }
