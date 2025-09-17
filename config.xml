@@ -151,6 +151,10 @@
     <layer id="platte1" folder="aufbau" keyPattern="platte-{farbe}-{breite}" dependsOn="plattenanzahl:1|2|3,aufbau:niedrig|hoch" offsetGroup="plattenOffsets"/>
     <layer id="platte2" folder="aufbau" keyPattern="platte-{farbe}-{breite}" dependsOn="plattenanzahl:2|3,aufbau:niedrig|hoch" offsetGroup="plattenOffsets"/>
     <layer id="platte3" folder="aufbau" keyPattern="platte-{farbe}-{breite}" dependsOn="plattenanzahl:3,aufbau:hoch" offsetGroup="plattenOffsets"/>
+
+    <layer id="laufschiene1" folder="laufschienen" keyPattern="laufschiene-{breite}" dependsOn="aufbau:hoch,laufschienenanzahl:1|2" offsetGroup="laufschienenOffsets"/>
+    <layer id="laufschiene2" folder="laufschienen" keyPattern="laufschiene-{breite}" dependsOn="aufbau:hoch,laufschienenanzahl:2" offsetGroup="laufschienenOffsets"/>
+  </layers>
  <layer
   id="ablagebord"
   folder="ablagebord"
@@ -169,18 +173,6 @@
          keyPattern="container-{farbe}-{containerfarbe}-{breite}"
          dependsOn="containerpos:rechts|links-rechts"
          offsetGroup="containerOffsets" />
-   
-  <layer id="laufschiene1" 
-         folder="laufschienen" 
-         keyPattern="laufschiene-{breite}" 
-         dependsOn="aufbau:hoch,laufschienenanzahl:1|2" 
-         offsetGroup="laufschienenOffsets"/>
-  <layer id="laufschiene2" 
-         folder="laufschienen" 
-         keyPattern="laufschiene-{breite}" 
-         dependsOn="aufbau:hoch,laufschienenanzahl:2" 
-         offsetGroup="laufschienenOffsets"/>
-  </layers>
 
   <offsets>
     <grundtische>
@@ -237,6 +229,16 @@
       <item id="platte3-1500" x="194" y="226" scaleX="0.515" scaleY="0.5"/>
       <item id="platte3-2000" x="198" y="231" scaleX="0.528" scaleY="0.5"/>
     </plattenOffsets>
+    <laufschienenOffsets>
+      <item id="laufschiene1-750" x="167" y="218" scaleX="0.235" scaleY="0.235"/>
+      <item id="laufschiene2-750" x="159" y="213" scaleX="0.251" scaleY="0.251"/>
+
+      <item id="laufschiene1-1500" x="170" y="181" scaleX="0.251" scaleY="0.251"/>
+      <item id="laufschiene2-1500" x="161" y="175" scaleX="0.26" scaleY="0.26"/>
+      
+      <item id="laufschiene1-2000" x="166" y="181" scaleX="0.24" scaleY="0.24"/>
+      <item id="laufschiene2-2000" x="157" y="175" scaleX="0.247" scaleY="0.247"/>
+    </laufschienenOffsets>
     <bodenOffsets>
       <item id="boden1-750" x="183" y="393" scaleX="0.4" scaleY="0.4"/>
       <item id="boden1-1500" x="183" y="376" scaleX="0.52" scaleY="0.5"/>
@@ -267,14 +269,6 @@
     <item breite="2000" side="left"  x="166" y="545" scaleX="0.25" scaleY="0.25"/>
     <item breite="2000" side="right" x="710" y="545" scaleX="0.25" scaleY="0.25"/>
   </containerOffsets>
-  <laufschienenOffsets>
-    <item id="laufschiene1-750" x="167" y="218" scaleX="0.235" scaleY="0.235"/>
-    <item id="laufschiene2-750" x="159" y="213" scaleX="0.251" scaleY="0.251"/>
-    <item id="laufschiene1-1500" x="170" y="181" scaleX="0.251" scaleY="0.251"/>
-    <item id="laufschiene2-1500" x="161" y="175" scaleX="0.26" scaleY="0.26"/>
-    <item id="laufschiene1-2000" x="166" y="181" scaleX="0.24" scaleY="0.24"/>
-    <item id="laufschiene2-2000" x="157" y="175" scaleX="0.247" scaleY="0.247"/>
-  </laufschienenOffsets>
     <ablagebordOffsets>
   <item id="ablagebord-buche-750"  x="172" y="621" scaleX="0.445" scaleY="0.42"/>
   <item id="ablagebord-buche-1500" x="168" y="620" scaleX="0.497" scaleY="0.50"/>
