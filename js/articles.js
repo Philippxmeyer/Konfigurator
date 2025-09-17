@@ -112,7 +112,7 @@ if (values.ablagebord && values.ablagebord !== "ohne") {
     a.href = BASE + encodeURIComponent(item.code);
     a.target = "_blank";
     a.rel = "noopener noreferrer";
-    a.innerHTML = `<strong>${item.label}</strong><br><span class="code">${item.code}</span>`;
+    a.innerHTML = `<span class="article-link-header">${item.label}</span><span class="code">${item.code}</span>`;
 
     li.appendChild(a);
     list.appendChild(li);
