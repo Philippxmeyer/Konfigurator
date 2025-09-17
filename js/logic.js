@@ -97,9 +97,6 @@ export function applyBodenPlattenLogic(values) {
       [...bodenSel.options].forEach(opt => opt.disabled = false);
     }
   }
-
-  values.bodenanzahl = bodenSel.value;
-  values.plattenanzahl = plattenSel.value;
 }
 
 // --- Container Logik ---
@@ -121,8 +118,6 @@ export function applyContainerLogic(values) {
     // 1500/2000: links, rechts, links-rechts erlaubt
     [...contSel.options].forEach(opt => opt.disabled = false);
   }
-
-  values.containerpos = contSel.value;
 }
 
 // --- Logik für Laufschienen ---
@@ -136,8 +131,6 @@ export function applyLaufschienenLogic(values) {
   } else {
     laufSel.disabled = false;
   }
-
-  values.laufschienenanzahl = laufSel.value;
 }
 
 export function applyAblagebordLogic(values) {
@@ -152,6 +145,4 @@ export function applyAblagebordLogic(values) {
   } else {
     sel.disabled = false;
   }
-
-  values.ablagebord = sel.value;
 }
