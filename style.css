@@ -140,7 +140,7 @@ button {
 /* --- Groups (Hauptblöcke) --- */
 .group {
   border: 1px solid rgba(148, 163, 184, 0.25);
-  border-radius: 16px;
+  border-radius: 8px;
   overflow: hidden;
   background: linear-gradient(180deg, rgba(246, 248, 255, 0.9) 0%, rgba(236, 240, 250, 0.9) 100%);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
@@ -153,12 +153,13 @@ button {
     inset 0 0 0 1px rgba(255, 255, 255, 0.5),
     0 24px 42px -28px rgba(37, 99, 235, 0.45);
   transform: translateY(-2px);
+  overflow: auto;
 }
 
 .group > h1 {
   font-size: 1.05rem;
   margin: 0;
-  padding: 18px 22px 18px 64px;
+  padding: 8px 16px 8px 64px;
   cursor: pointer;
   position: relative;
   color: #1f2937;
@@ -177,8 +178,8 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   border: 2px solid #2563eb;
   color: #2563eb;
@@ -195,7 +196,7 @@ button {
 .section h2 {
   font-size: 0.95rem;
   margin: 0;
-  padding: 16px 20px 16px 64px;
+  padding: 8px 16px 8px 64px;
   cursor: pointer;
   position: relative;
   background: linear-gradient(135deg, rgba(248, 250, 255, 0.9), rgba(237, 241, 250, 0.9));
@@ -214,8 +215,8 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   border: 2px solid rgba(37, 99, 235, 0.65);
   color: rgba(29, 78, 216, 0.9);
@@ -257,8 +258,8 @@ button {
 select {
   width: 100%;
   margin: 6px 0 18px 0;
-  padding: 12px 14px;
-  border-radius: 12px;
+  padding: 7px 12px;
+  border-radius: 6px;
   border: 1px solid rgba(148, 163, 184, 0.45);
   background: linear-gradient(135deg, #f9faff, #eef1f7);
   font-size: 0.95rem;
@@ -309,7 +310,7 @@ select:focus-visible {
 
 .article-overlay__dialog {
   background: #ffffff;
-  border-radius: 24px;
+  border-radius: 20px;
   width: min(92vw, 540px);
   max-height: 82vh;
   display: flex;
@@ -377,7 +378,7 @@ select:focus-visible {
   flex: 1;
   overflow-y: auto;
   border: 1px solid rgba(148, 163, 184, 0.25);
-  border-radius: 18px;
+  border-radius: 8px;
   background: rgba(248, 250, 255, 0.95);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
 }
@@ -393,15 +394,15 @@ select:focus-visible {
 
 .article-overlay__list li {
   border-bottom: none;
-  border-radius: 16px;
+  border-radius: 8px;
   background: #ffffff;
   box-shadow: 0 18px 32px -26px rgba(15, 23, 42, 0.55);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .article-overlay__list li:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 26px 42px -26px rgba(37, 99, 235, 0.55);
+  transform: translateY(-1px);
+  box-shadow: 0 26px 42px -26px rgba(37, 99, 235, 0.35);
 }
 
 .article-overlay__list li:last-child {
@@ -411,8 +412,8 @@ select:focus-visible {
 .article-overlay__list a {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 18px 22px;
+  gap: 0px;
+  padding: 8px 22px;
   text-decoration: none;
   color: #1f2937;
   font-weight: 600;
