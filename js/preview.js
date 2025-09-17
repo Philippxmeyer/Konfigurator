@@ -4,24 +4,12 @@ import { placeImage } from "./imageManager.js";
 import { renderArticleList } from "./articles.js";
 import { updateURL } from "./share.js";
 
-const BASE_STAGE_WIDTH = 1180;
-
 export function updatePreview(configXML, images) {
   const values = {};
   document.querySelectorAll(".sidebar select").forEach(sel => values[sel.id] = sel.value);
 
-  const stageEl = document.getElementById("stage");
-  let stageScale = 1;
-  if (stageEl) {
-    const rect = stageEl.getBoundingClientRect();
-    const width = rect.width || stageEl.clientWidth;
-    if (width) {
-      stageScale = Math.max(width / BASE_STAGE_WIDTH, 0.1);
-    }
-  }
-
   // --- Spezial-Logik für AST31-EL ---
-        applyAst31Logic(values);
+  	applyAst31Logic(values);
 
   // --- Logik für Böden + Platten ---
   	applyBodenPlattenLogic(values);
@@ -109,11 +97,11 @@ export function updatePreview(configXML, images) {
     }
 
     // --- Bild anzeigen ---
-    placeImage(images[id], `bilder/${folder}/${key}.png`, cfg, stageScale);
+    placeImage(images[id], `bilder/${folder}/${key}.png`, cfg);
 
 
     // Sonderfall: Container rechts → Bild spiegeln
-        if (id === "containerRechts") {
+	if (id === "containerRechts") {
   	images[id].style.transform += " scaleX(-1)";
 	}
   });
