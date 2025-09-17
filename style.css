@@ -344,6 +344,10 @@ select:focus-visible {
   letter-spacing: 0.01em;
 }
 
+.article-link-header {
+  font-weight: 700;
+} 
+
 .article-overlay__close {
   font-size: 1.1rem;
   line-height: 1;
