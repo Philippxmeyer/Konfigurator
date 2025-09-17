@@ -56,6 +56,14 @@ button {
 
 #preview { touch-action: none; }
 
+#preview.is-grabbable {
+  cursor: grab;
+}
+
+#preview.is-grabbing {
+  cursor: grabbing;
+}
+
 
 /* --- Preview-Bereich --- */
 #preview {
