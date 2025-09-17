@@ -415,9 +415,9 @@ select:focus-visible {
 
 .article-overlay__list a {
   display: flex;
-  flex-direction: column;
-  gap: 0px;
-  padding: 8px 22px;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 22px;
   text-decoration: none;
   color: #1f2937;
   font-weight: 600;
@@ -433,6 +433,35 @@ select:focus-visible {
   font-size: 0.82rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.article-link__thumb {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(226, 232, 240, 0.45);
+  overflow: hidden;
+}
+
+.article-link__thumb--hidden {
+  display: none;
+}
+
+.article-link__image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.article-link__content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .article-overlay__empty {
