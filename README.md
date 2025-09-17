@@ -115,4 +115,4 @@ arbeitstisch-konfigurator/
 Pull Requests sind willkommen! Bitte achte auf verständliche Commits und teste deine Änderungen in allen gängigen Browsern. Wenn du Fragen zur Struktur hast, melde dich gern über Issues.
 
 ## Lizenz
-Dieses Projekt steht unter der MIT-Lizenz. Details siehe [`LICENSE`](LICENSE).
+Dieses Projekt steht unter der GNU General Public License v3.0. Details siehe [`LICENSE`](LICENSE).
