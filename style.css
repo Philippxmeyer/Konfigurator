@@ -163,6 +163,10 @@ input {
   transition: background 0.2s ease, color 0.2s ease;
 }
 
+.group.collapsed .section {
+  display: none;
+}
+
 .group > h1:hover {
   background: rgba(47, 109, 246, 0.14);
 }
