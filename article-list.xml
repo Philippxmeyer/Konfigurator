@@ -21,8 +21,8 @@
 <!-- Seitenblenden (unabhängig von Breite, links/rechts identisch) -->
 <seitenblende key="lichtgrau" number="403818"/>
 <seitenblende key="weissaluminium" number="403820"/>
-<seitenblende key="anthrazit" number="403822"/>
-<seitenblende key="blau" number="403824"/>
+<seitenblende key="blau" number="403822"/>
+<seitenblende key="anthrazit" number="403824"/>
 <!-- Aufbauten (nur hoch/niedrig, breitenunabhängig) -->
 <aufbau key="niedrig" number="403808"/>
 <aufbau key="hoch" number="403809"/>
@@ -41,22 +41,22 @@
 <platte key="weissaluminium-1500" number="403816"/>
 <platte key="weissaluminium-2000" number="403817"/>
 <!-- Container -->
-<container key="lichtgrau-lichtgrau" number="400001"/>
-<container key="lichtgrau-blau" number="400002"/>
-<container key="lichtgrau-anthrazit" number="400003"/>
-<container key="weissaluminium-weissaluminium" number="400004"/>
-<container key="weissaluminium-blau" number="400005"/>
-<container key="weissaluminium-anthrazit" number="400006"/>
+<container key="lichtgrau-lichtgrau" number="404791"/>
+<container key="lichtgrau-blau" number="404792"/>
+<container key="lichtgrau-anthrazit" number="404795"/>
+<container key="weissaluminium-weissaluminium" number="404799"/>
+<container key="weissaluminium-blau" number="404797"/>
+<container key="weissaluminium-anthrazit" number="404796"/>
 <!-- Laufschienen -->
-<laufschiene key="750" number="12345"/>
-<laufschiene key="1500" number="12345"/>
-<laufschiene key="2000" number="12345"/>
+<laufschiene key="750" number="402964"/>
+<laufschiene key="1500" number="402965"/>
+<laufschiene key="2000" number="402966"/>
 <!-- Ablageborde -->
-<ablagebord key="buche-750"  number="404101"/>
-<ablagebord key="buche-1500" number="404102"/>
-<ablagebord key="buche-2000" number="404103"/>
-<ablagebord key="weiss-750"  number="404104"/>
-<ablagebord key="weiss-1500" number="404105"/>
-<ablagebord key="weiss-2000" number="404106"/>
+<ablagebord key="buche-750"  number="403834"/>
+<ablagebord key="buche-1500" number="403836"/>
+<ablagebord key="buche-2000" number="403837"/>
+<ablagebord key="weiss-750"  number="400039"/>
+<ablagebord key="weiss-1500" number="400049"/>
+<ablagebord key="weiss-2000" number="400059"/>
 
 </articles>
