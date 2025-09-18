@@ -605,7 +605,7 @@ select:focus-visible {
 
 /* --- Logo oben links --- */
 :root {
-  --logo-width: clamp(160px, 32vw, 300px);   /* Breite ändern */
+  --logo-width: clamp(240px, 60vw, 300px);   /* Breite ändern */
   --logo-margin: 10px;   /* äußerer Abstand */
   --logo-padding: 0px;   /* innerer Abstand */
 }
@@ -651,7 +651,7 @@ select:focus-visible {
     padding: 24px 20px 28px;
     align-items: center;
     justify-content: center;
-    min-height: 450px;
+    min-height: 350px;
     flex: none;
     width: 100%;
   }
@@ -688,7 +688,7 @@ select:focus-visible {
 
   #preview {
     padding: 20px 14px 24px;
-    min-height: 450px;
+    min-height: 350px;
   }
 
   .sidebar-container {
