@@ -84,6 +84,7 @@ button {
   aspect-ratio: 12 / 7;      /* entspricht z.B. 1200×700 */
   transform-origin: top left;/* Offsets bleiben stabil beim Zoom */
   will-change: transform;
+  margin: 100px 0  0 80px;
 }
 
 /* Bilder hängen jetzt unter #stage */
