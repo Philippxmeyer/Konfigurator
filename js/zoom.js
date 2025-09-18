@@ -1,10 +1,13 @@
 // zoom.js
 let zoomLevel = 1;
 let pan = { x: 0, y: 0 };
+
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 2.5;
 const WHEEL_STEP = 0.1;
-const PAN_THRESHOLD = 1.01;
+
+// Ab diesem Zoom darf gepannt werden (0 = immer)
+const PAN_THRESHOLD = 0;
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -20,6 +23,19 @@ function clientToStagePercent(stage, clientX, clientY) {
   const x = ((clientX - r.left) / r.width) * 100;
   const y = ((clientY - r.top) / r.height) * 100;
   return { xPct: x, yPct: y };
+}
+
+function getTouchDistance(t1, t2) {
+  const dx = t1.clientX - t2.clientX;
+  const dy = t1.clientY - t2.clientY;
+  return Math.hypot(dx, dy);
+}
+
+function getTouchCenter(t1, t2) {
+  return {
+    x: (t1.clientX + t2.clientX) / 2,
+    y: (t1.clientY + t2.clientY) / 2,
+  };
 }
 
 export function initPreviewZoom(previewId = "preview", stageId = "stage") {
@@ -55,57 +71,8 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
     return null;
   };
 
-  const clampPan = () => {
-    const containerRect = container.getBoundingClientRect();
-    const stageRect = stage.getBoundingClientRect();
-    let changed = false;
-    let nextX = pan.x;
-    let nextY = pan.y;
-
-    if (stageRect.width <= containerRect.width) {
-      if (nextX !== 0) {
-        nextX = 0;
-        changed = true;
-      }
-    } else {
-      if (stageRect.left > containerRect.left) {
-        nextX -= stageRect.left - containerRect.left;
-        changed = true;
-      }
-      if (stageRect.right < containerRect.right) {
-        nextX += containerRect.right - stageRect.right;
-        changed = true;
-      }
-    }
-
-    if (stageRect.height <= containerRect.height) {
-      if (nextY !== 0) {
-        nextY = 0;
-        changed = true;
-      }
-    } else {
-      if (stageRect.top > containerRect.top) {
-        nextY -= stageRect.top - containerRect.top;
-        changed = true;
-      }
-      if (stageRect.bottom < containerRect.bottom) {
-        nextY += containerRect.bottom - stageRect.bottom;
-        changed = true;
-      }
-    }
-
-    if (changed) {
-      pan.x = nextX;
-      pan.y = nextY;
-    }
-    return changed;
-  };
-
   const updateTransform = (originPct = null) => {
     applyTransform(stage, zoomLevel, originPct);
-    //if (clampPan()) {
-    //  applyTransform(stage, zoomLevel);
-    //}
     const canPan = zoomLevel > PAN_THRESHOLD;
     container.classList.toggle("is-grabbable", canPan);
     if (!pointerPan.active && !canPan) {
@@ -140,6 +107,15 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
     updateTransform();
   };
 
+  // --- Initial: pan.x = 30% der Bühnenbreite ---
+  requestAnimationFrame(() => {
+    const stageWidth = stage.offsetWidth; // unskaliert, unabhängig vom aktuellen transform
+    pan.x = stageWidth * 0.3;
+    pan.y = 100;
+    updateTransform({ xPct: 50, yPct: 50 });
+  });
+
+  // --- Mauswheel Zoom ---
   container.addEventListener(
     "wheel",
     (e) => {
@@ -158,21 +134,28 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
     { passive: false }
   );
 
+  // --- Doppelklick: Reset auf 30% ---
   container.addEventListener("dblclick", () => {
+    // Erst Zoom zurücksetzen
     zoomLevel = 1;
-    pan.x = 0;
-    pan.y = 0;
+
+    // Breite ohne Transform lesen, damit 30% stabil sind
+    const stageWidth = stage.offsetWidth;
+
+    // Pan auf 30% (x) und 0 (y)
+    pan.x = stageWidth * 0.3;
+    pan.y = 100;
+
+    // Pointer-Status zurücksetzen
     pointerPan.active = false;
     pointerPan.type = null;
     pointerPan.touchId = null;
     container.classList.remove("is-grabbing");
+
     updateTransform({ xPct: 50, yPct: 50 });
   });
 
-  let pinchActive = false;
-  let pinchStartDist = 0;
-  let pinchStartZoom = 1;
-
+  // --- Maus-Panning ---
   container.addEventListener("mousedown", (e) => {
     if (e.button !== 0) return;
     if (zoomLevel <= PAN_THRESHOLD) return;
@@ -194,6 +177,11 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
       endPan();
     }
   });
+
+  // --- Touch: Pinch & Pan ---
+  let pinchActive = false;
+  let pinchStartDist = 0;
+  let pinchStartZoom = 1;
 
   container.addEventListener(
     "touchstart",
@@ -311,5 +299,6 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
     }
   });
 
+  // Initiale Ausrichtung (Transform-Origin zentriert)
   updateTransform({ xPct: 50, yPct: 50 });
 }
