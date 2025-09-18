@@ -18,8 +18,8 @@ const DEFAULT_VIEW_CONFIG = {
 };
 
 const COMPACT_VIEW_CONFIG = {
-  zoom: 0.92,
-  panXFactor: 0.18,
+  zoom: 0.6,
+  panXFactor: 0,
   panY: 90,
 };
 
