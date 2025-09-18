@@ -103,9 +103,9 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
 
   const updateTransform = (originPct = null) => {
     applyTransform(stage, zoomLevel, originPct);
-    if (clampPan()) {
-      applyTransform(stage, zoomLevel);
-    }
+    //if (clampPan()) {
+    //  applyTransform(stage, zoomLevel);
+    //}
     const canPan = zoomLevel > PAN_THRESHOLD;
     container.classList.toggle("is-grabbable", canPan);
     if (!pointerPan.active && !canPan) {
