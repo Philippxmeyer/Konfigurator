@@ -169,111 +169,112 @@
            dependsOn="containerpos:rechts|links-rechts"
            offsetGroup="containerOffsets"/>
   </layers>
-
-  <offsets>
+ <offsets>
     <grundtische>
-        <item id="ast31-lichtgrau-buche-750" x="150" y="500" scaleX="0.502" scaleY="0.5"/>
-        <item id="ast31-lichtgrau-buche-1500" x="151" y="500" scaleX="0.502" scaleY="0.5"/>
-        <item id="ast31-lichtgrau-buche-2000" x="150" y="500" scaleX="0.512" scaleY="0.5"/>
-        <item id="ast31-lichtgrau-weiss-750" x="150" y="500" scaleX="0.5" scaleY="0.5"/>
-        <item id="ast31-lichtgrau-weiss-1500" x="151" y="500" scaleX="0.5" scaleY="0.5"/>
-        <item id="ast31-lichtgrau-weiss-2000" x="150" y="500" scaleX="0.5" scaleY="0.5"/>
-        <item id="ast31-weissaluminium-buche-750" x="150" y="500" scaleX="0.502" scaleY="0.5"/>
-        <item id="ast31-weissaluminium-buche-1500" x="150" y="500" scaleX="0.502" scaleY="0.5"/>
-        <item id="ast31-weissaluminium-buche-2000" x="150" y="500" scaleX="0.512" scaleY="0.5"/>
-        <item id="ast31-weissaluminium-weiss-750" x="150" y="500" scaleX="0.5" scaleY="0.5"/>
-        <item id="ast31-weissaluminium-weiss-1500" x="150" y="500" scaleX="0.5" scaleY="0.5"/>
-        <item id="ast31-weissaluminium-weiss-2000" x="150" y="500" scaleX="0.5" scaleY="0.5"/>
-        <item id="ast31-el-weissaluminium-buche-750" x="154" y="499" scaleX="0.468" scaleY="0.4"/>
-        <item id="ast31-el-weissaluminium-buche-1500" x="150" y="500" scaleX="0.473" scaleY="0.45"/>
-        <item id="ast31-el-weissaluminium-buche-2000" x="150" y="500" scaleX="0.48" scaleY="0.48"/>
-        <item id="ast31-el-weissaluminium-weiss-750" x="156" y="499" scaleX="0.392" scaleY="0.4"/>
-        <item id="ast31-el-weissaluminium-weiss-1500" x="150" y="500" scaleX="0.473" scaleY="0.45"/>
-        <item id="ast31-el-weissaluminium-weiss-2000" x="150" y="500" scaleX="0.48" scaleY="0.48"/>
+        <item id="ast31-lichtgrau-buche-750" x="0" y="340" scaleX="0.502" scaleY="0.5"/>
+        <item id="ast31-lichtgrau-buche-1500" x="1" y="340" scaleX="0.502" scaleY="0.5"/>
+        <item id="ast31-lichtgrau-buche-2000" x="0" y="340" scaleX="0.512" scaleY="0.5"/>
+        <item id="ast31-lichtgrau-weiss-750" x="0" y="340" scaleX="0.5" scaleY="0.5"/>
+        <item id="ast31-lichtgrau-weiss-1500" x="1" y="340" scaleX="0.5" scaleY="0.5"/>
+        <item id="ast31-lichtgrau-weiss-2000" x="0" y="340" scaleX="0.5" scaleY="0.5"/>
+        <item id="ast31-weissaluminium-buche-750" x="0" y="340" scaleX="0.502" scaleY="0.5"/>
+        <item id="ast31-weissaluminium-buche-1500" x="0" y="340" scaleX="0.502" scaleY="0.5"/>
+        <item id="ast31-weissaluminium-buche-2000" x="0" y="340" scaleX="0.512" scaleY="0.5"/>
+        <item id="ast31-weissaluminium-weiss-750" x="0" y="340" scaleX="0.5" scaleY="0.5"/>
+        <item id="ast31-weissaluminium-weiss-1500" x="0" y="340" scaleX="0.5" scaleY="0.5"/>
+        <item id="ast31-weissaluminium-weiss-2000" x="0" y="340" scaleX="0.5" scaleY="0.5"/>
+        <item id="ast31-el-weissaluminium-buche-750" x="4" y="339" scaleX="0.468" scaleY="0.4"/>
+        <item id="ast31-el-weissaluminium-buche-1500" x="0" y="340" scaleX="0.473" scaleY="0.45"/>
+        <item id="ast31-el-weissaluminium-buche-2000" x="0" y="340" scaleX="0.48" scaleY="0.48"/>
+        <item id="ast31-el-weissaluminium-weiss-750" x="6" y="339" scaleX="0.392" scaleY="0.4"/>
+        <item id="ast31-el-weissaluminium-weiss-1500" x="0" y="340" scaleX="0.473" scaleY="0.45"/>
+        <item id="ast31-el-weissaluminium-weiss-2000" x="0" y="340" scaleX="0.48" scaleY="0.48"/>
 
     </grundtische>
     <seitenOffsets>
-      <item breite="750" side="left" x="168" y="543" scaleX="0.375" scaleY="0.375"/>
-      <item breite="750" side="right" x="338" y="543" scaleX="0.375" scaleY="0.375"/>
+      <item breite="750" side="left" x="18" y="383" scaleX="0.375" scaleY="0.375"/>
+      <item breite="750" side="right" x="188" y="383" scaleX="0.375" scaleY="0.375"/>
         
-      <item breite="1500" side="left" x="167" y="543" scaleX="0.38" scaleY="0.38"/>
-      <item breite="1500" side="right" x="553" y="544" scaleX="0.37" scaleY="0.37"/>
+      <item breite="1500" side="left" x="17" y="383" scaleX="0.38" scaleY="0.38"/>
+      <item breite="1500" side="right" x="403" y="384" scaleX="0.37" scaleY="0.37"/>
         
-      <item breite="2000" side="left" x="167" y="543" scaleX="0.38" scaleY="0.38"/>
-      <item breite="2000" side="right" x="693" y="543" scaleX="0.38" scaleY="0.38"/>
+      <item breite="2000" side="left" x="17" y="383" scaleX="0.38" scaleY="0.38"/>
+      <item breite="2000" side="right" x="543" y="383" scaleX="0.38" scaleY="0.38"/>
       <!-- usw. -->
     </seitenOffsets>
     <saeulenOffsets>
-      <item id="saeulen-niedrig-750" x="157" y="342" scaleX="0.495" scaleY="0.5"/>
-      <item id="saeulen-niedrig-1500" x="155" y="321" scaleX="0.518" scaleY="0.5"/>
-      <item id="saeulen-niedrig-2000" x="155" y="322" scaleX="0.528" scaleY="0.5"/>
+      <item id="saeulen-niedrig-750" x="7" y="182" scaleX="0.495" scaleY="0.5"/>
+      <item id="saeulen-niedrig-1500" x="5" y="161" scaleX="0.518" scaleY="0.5"/>
+      <item id="saeulen-niedrig-2000" x="5" y="162" scaleX="0.528" scaleY="0.5"/>
         
-      <item id="saeulen-hoch-750" x="157" y="200" scaleX="0.495" scaleY="0.5"/>
-      <item id="saeulen-hoch-1500" x="155" y="162" scaleX="0.518" scaleY="0.5"/>
-      <item id="saeulen-hoch-2000" x="155" y="162" scaleX="0.528" scaleY="0.5"/>
+      <item id="saeulen-hoch-750" x="7" y="40" scaleX="0.495" scaleY="0.5"/>
+      <item id="saeulen-hoch-1500" x="5" y="2" scaleX="0.518" scaleY="0.5"/>
+      <item id="saeulen-hoch-2000" x="5" y="2" scaleX="0.528" scaleY="0.5"/>
     </saeulenOffsets>
     <plattenOffsets>
-      <item id="platte1-750"  x="193" y="422" scaleX="0.342" scaleY="0.32"/>
-      <item id="platte1-1500" x="194" y="406" scaleX="0.515" scaleY="0.5"/>
-      <item id="platte1-2000" x="198" y="411" scaleX="0.528" scaleY="0.5"/>
+      <item id="platte1-750"  x="43" y="262" scaleX="0.342" scaleY="0.32"/>
+      <item id="platte1-1500" x="44" y="246" scaleX="0.515" scaleY="0.5"/>
+      <item id="platte1-2000" x="48" y="251" scaleX="0.528" scaleY="0.5"/>
 
-      <item id="platte2-750"  x="193" y="344" scaleX="0.342" scaleY="0.32"/>
-      <item id="platte2-1500" x="194" y="316" scaleX="0.515" scaleY="0.5"/>
-      <item id="platte2-2000" x="198" y="321" scaleX="0.528" scaleY="0.5"/>
+      <item id="platte2-750"  x="43" y="184" scaleX="0.342" scaleY="0.32"/>
+      <item id="platte2-1500" x="44" y="156" scaleX="0.515" scaleY="0.5"/>
+      <item id="platte2-2000" x="48" y="161" scaleX="0.528" scaleY="0.5"/>
 
-      <item id="platte3-750"  x="193" y="266" scaleX="0.342" scaleY="0.32"/>
-      <item id="platte3-1500" x="194" y="226" scaleX="0.515" scaleY="0.5"/>
-      <item id="platte3-2000" x="198" y="231" scaleX="0.528" scaleY="0.5"/>
+      <item id="platte3-750"  x="43" y="106" scaleX="0.342" scaleY="0.32"/>
+      <item id="platte3-1500" x="44" y="66" scaleX="0.515" scaleY="0.5"/>
+      <item id="platte3-2000" x="48" y="71" scaleX="0.528" scaleY="0.5"/>
     </plattenOffsets>
     <laufschienenOffsets>
-      <item id="laufschiene1-750" x="167" y="218" scaleX="0.235" scaleY="0.235"/>
-      <item id="laufschiene2-750" x="159" y="213" scaleX="0.251" scaleY="0.251"/>
+      <item id="laufschiene1-750" x="17" y="58" scaleX="0.235" scaleY="0.235"/>
+      <item id="laufschiene2-750" x="9" y="53" scaleX="0.251" scaleY="0.251"/>
 
-      <item id="laufschiene1-1500" x="170" y="181" scaleX="0.251" scaleY="0.251"/>
-      <item id="laufschiene2-1500" x="161" y="175" scaleX="0.26" scaleY="0.26"/>
+      <item id="laufschiene1-1500" x="20" y="21" scaleX="0.251" scaleY="0.251"/>
+      <item id="laufschiene2-1500" x="11" y="15" scaleX="0.26" scaleY="0.26"/>
       
-      <item id="laufschiene1-2000" x="166" y="181" scaleX="0.24" scaleY="0.24"/>
-      <item id="laufschiene2-2000" x="157" y="175" scaleX="0.247" scaleY="0.247"/>
+      <item id="laufschiene1-2000" x="16" y="21" scaleX="0.24" scaleY="0.24"/>
+      <item id="laufschiene2-2000" x="7" y="15" scaleX="0.247" scaleY="0.247"/>
     </laufschienenOffsets>
     <bodenOffsets>
-      <item id="boden1-750" x="183" y="393" scaleX="0.4" scaleY="0.4"/>
-      <item id="boden1-1500" x="183" y="376" scaleX="0.52" scaleY="0.5"/>
-      <item id="boden1-2000" x="184" y="376" scaleX="0.456" scaleY="0.456"/>
+      <item id="boden1-750" x="33" y="233" scaleX="0.4" scaleY="0.4"/>
+      <item id="boden1-1500" x="33" y="216" scaleX="0.52" scaleY="0.5"/>
+      <item id="boden1-2000" x="34" y="216" scaleX="0.456" scaleY="0.456"/>
 
-      <item id="boden2-750" x="183" y="355" scaleX="0.4" scaleY="0.4"/>
-      <item id="boden2-1500" x="183" y="335" scaleX="0.52" scaleY="0.5"/>
-      <item id="boden2-2000" x="184" y="335" scaleX="0.456" scaleY="0.456"/>
+      <item id="boden2-750" x="33" y="195" scaleX="0.4" scaleY="0.4"/>
+      <item id="boden2-1500" x="33" y="175" scaleX="0.52" scaleY="0.5"/>
+      <item id="boden2-2000" x="34" y="175" scaleX="0.456" scaleY="0.456"/>
 
-      <item id="boden3-750" x="183" y="310" scaleX="0.4" scaleY="0.4"/>
-      <item id="boden3-1500" x="183" y="285" scaleX="0.52" scaleY="0.5"/>
-      <item id="boden3-2000" x="184" y="285" scaleX="0.456" scaleY="0.456"/>
+      <item id="boden3-750" x="33" y="150" scaleX="0.4" scaleY="0.4"/>
+      <item id="boden3-1500" x="33" y="125" scaleX="0.52" scaleY="0.5"/>
+      <item id="boden3-2000" x="34" y="125" scaleX="0.456" scaleY="0.456"/>
 
-      <item id="boden4-750" x="183" y="275" scaleX="0.4" scaleY="0.4"/>
-      <item id="boden4-1500" x="183" y="242" scaleX="0.52" scaleY="0.5"/>
-      <item id="boden4-2000" x="184" y="242" scaleX="0.456" scaleY="0.456"/>
+      <item id="boden4-750" x="33" y="115" scaleX="0.4" scaleY="0.4"/>
+      <item id="boden4-1500" x="33" y="82" scaleX="0.52" scaleY="0.5"/>
+      <item id="boden4-2000" x="34" y="82" scaleX="0.456" scaleY="0.456"/>
   </bodenOffsets>
     <containerOffsets>
     <!-- 750 mm: nur links/rechts -->
-    <item breite="750" side="left"  x="166" y="545" scaleX="0.25" scaleY="0.25"/>
-    <item breite="750" side="right" x="356" y="545" scaleX="0.25" scaleY="0.25"/>
+    <item breite="750" side="left"  x="16" y="385" scaleX="0.25" scaleY="0.25"/>
+    <item breite="750" side="right" x="206" y="385" scaleX="0.25" scaleY="0.25"/>
 
     <!-- 1500 mm: links/rechts/links+rechts -->
-    <item breite="1500" side="left"  x="166" y="545" scaleX="0.25" scaleY="0.25"/>
-    <item breite="1500" side="right" x="570" y="545" scaleX="0.25" scaleY="0.25"/>
+    <item breite="1500" side="left"  x="16" y="385" scaleX="0.25" scaleY="0.25"/>
+    <item breite="1500" side="right" x="420" y="385" scaleX="0.25" scaleY="0.25"/>
 
     <!-- 2000 mm: links/rechts/links+rechts -->
-    <item breite="2000" side="left"  x="166" y="545" scaleX="0.25" scaleY="0.25"/>
-    <item breite="2000" side="right" x="710" y="545" scaleX="0.25" scaleY="0.25"/>
+    <item breite="2000" side="left"  x="16" y="385" scaleX="0.25" scaleY="0.25"/>
+    <item breite="2000" side="right" x="560" y="385" scaleX="0.25" scaleY="0.25"/>
   </containerOffsets>
     <ablagebordOffsets>
-  <item id="ablagebord-buche-750"  x="172" y="621" scaleX="0.445" scaleY="0.42"/>
-  <item id="ablagebord-buche-1500" x="168" y="620" scaleX="0.497" scaleY="0.50"/>
-  <item id="ablagebord-buche-2000" x="171" y="619" scaleX="0.5" scaleY="0.5"/>
+  <item id="ablagebord-buche-750"  x="22" y="461" scaleX="0.445" scaleY="0.42"/>
+  <item id="ablagebord-buche-1500" x="18" y="460" scaleX="0.497" scaleY="0.50"/>
+  <item id="ablagebord-buche-2000" x="21" y="459" scaleX="0.5" scaleY="0.5"/>
 
-  <item id="ablagebord-weiss-750"  x="174" y="623" scaleX="0.38" scaleY="0.5"/>
-  <item id="ablagebord-weiss-1500" x="170" y="625" scaleX="0.497" scaleY="0.55"/>
-  <item id="ablagebord-weiss-2000" x="171" y="621" scaleX="0.53" scaleY="0.55"/>
+  <item id="ablagebord-weiss-750"  x="24" y="463" scaleX="0.38" scaleY="0.5"/>
+  <item id="ablagebord-weiss-1500" x="20" y="465" scaleX="0.497" scaleY="0.55"/>
+  <item id="ablagebord-weiss-2000" x="21" y="461" scaleX="0.53" scaleY="0.55"/>
 </ablagebordOffsets>
 
   </offsets>
+
+
 </config>
