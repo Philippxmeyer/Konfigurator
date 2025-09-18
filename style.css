@@ -651,7 +651,7 @@ select:focus-visible {
     padding: 24px 20px 28px;
     align-items: center;
     justify-content: center;
-    min-height: 320px;
+    min-height: 450px;
     flex: none;
     width: 100%;
   }
@@ -688,7 +688,7 @@ select:focus-visible {
 
   #preview {
     padding: 20px 14px 24px;
-    min-height: 280px;
+    min-height: 450px;
   }
 
   .sidebar-container {
