@@ -20,7 +20,7 @@ const DEFAULT_VIEW_CONFIG = {
 const COMPACT_VIEW_CONFIG = {
   zoom: 0.6,
   panXFactor: 0,
-  panY: 90,
+  panY: -100,
 };
 
 const VIEW_PRESETS = {
