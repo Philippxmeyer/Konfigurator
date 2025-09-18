@@ -3,25 +3,32 @@ import { applyAst31Logic, applyBodenPlattenLogic, applyContainerLogic, applyLauf
 import { placeImage } from "./imageManager.js";
 import { renderArticleList } from "./articles.js";
 import { updateURL } from "./share.js";
+import { syncSliderControls } from "./uiBuilder.js";
 
 export function updatePreview(configXML, images) {
   const values = {};
   document.querySelectorAll(".sidebar select").forEach(sel => values[sel.id] = sel.value);
 
   // --- Spezial-Logik für AST31-EL ---
-  	applyAst31Logic(values);
+  applyAst31Logic(values);
 
   // --- Logik für Böden + Platten ---
-  	applyBodenPlattenLogic(values);
+  applyBodenPlattenLogic(values);
 
   // --- Logik für Container ---
-  	applyContainerLogic(values);
+  applyContainerLogic(values);
   // --- Logik für Laufschienen ---
-	applyLaufschienenLogic(values);
+  applyLaufschienenLogic(values);
   // --- Logik für Ablagebords ---
-	applyAblagebordLogic(values);
+  applyAblagebordLogic(values);
 
-  
+  syncSliderControls();
+
+  document.querySelectorAll(".sidebar select").forEach(sel => {
+    values[sel.id] = sel.value;
+  });
+
+
   // --- Layer abarbeiten ---
   configXML.querySelectorAll("layers > layer").forEach(layerNode => {
     const id = layerNode.getAttribute("id");
