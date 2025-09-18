@@ -56,6 +56,14 @@ button {
 
 #preview { touch-action: none; }
 
+#preview.is-grabbable {
+  cursor: grab;
+}
+
+#preview.is-grabbing {
+  cursor: grabbing;
+}
+
 
 /* --- Preview-Bereich --- */
 #preview {
@@ -75,6 +83,7 @@ button {
   width: min(100%, 1200px);  /* Basisbreite, responsiv begrenzt */
   aspect-ratio: 12 / 7;      /* entspricht z.B. 1200×700 */
   transform-origin: top left;/* Offsets bleiben stabil beim Zoom */
+  touch-action: none;
   will-change: transform;
 }
 
