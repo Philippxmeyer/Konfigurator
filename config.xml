@@ -189,7 +189,7 @@
         <item id="ast31-el-weissaluminium-weiss-750" x="156" y="339" scaleX="0.392" scaleY="0.4"/>
         <item id="ast31-el-weissaluminium-weiss-1500" x="150" y="340" scaleX="0.473" scaleY="0.45"/>
         <item id="ast31-el-weissaluminium-weiss-2000" x="150" y="340" scaleX="0.48" scaleY="0.48"/>
-
+ <offsets>
     </grundtische>
     <seitenOffsets>
       <item breite="750" side="left" x="168" y="383" scaleX="0.375" scaleY="0.375"/>
