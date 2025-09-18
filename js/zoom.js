@@ -9,6 +9,33 @@ const WHEEL_STEP = 0.1;
 // Ab diesem Zoom darf gepannt werden (0 = immer)
 const PAN_THRESHOLD = 0;
 
+const DEFAULT_TRANSFORM_ORIGIN = { xPct: 50, yPct: 50 };
+
+const DEFAULT_VIEW_CONFIG = {
+  zoom: 1,
+  panXFactor: 0.3,
+  panY: 100,
+};
+
+const COMPACT_VIEW_CONFIG = {
+  zoom: 0.92,
+  panXFactor: 0.18,
+  panY: 90,
+};
+
+const VIEW_PRESETS = {
+  default: {
+    initial: { ...DEFAULT_VIEW_CONFIG },
+    reset: { ...DEFAULT_VIEW_CONFIG },
+  },
+  compact: {
+    initial: { ...COMPACT_VIEW_CONFIG },
+    reset: { ...COMPACT_VIEW_CONFIG },
+  },
+};
+
+const RESPONSIVE_BREAKPOINT = "(max-width: 1024px)";
+
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 function applyTransform(stage, zoom, originPct = null) {
@@ -51,6 +78,28 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
     baseY: 0,
     type: null,
     touchId: null,
+  };
+
+  const responsiveMediaQuery =
+    typeof window !== "undefined" && typeof window.matchMedia === "function"
+      ? window.matchMedia(RESPONSIVE_BREAKPOINT)
+      : null;
+
+  const getPresetKey = () =>
+    responsiveMediaQuery && responsiveMediaQuery.matches ? "compact" : "default";
+
+  let activePresetKey = getPresetKey();
+
+  const fallbackView = VIEW_PRESETS.default.initial;
+
+  const getActivePreset = () =>
+    VIEW_PRESETS[activePresetKey] ?? VIEW_PRESETS.default;
+
+  const resetPointerState = () => {
+    pointerPan.active = false;
+    pointerPan.type = null;
+    pointerPan.touchId = null;
+    container.classList.remove("is-grabbing");
   };
 
   const isPointOverStage = (clientX, clientY) => {
@@ -100,19 +149,64 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
 
   const endPan = () => {
     if (!pointerPan.active) return;
-    pointerPan.active = false;
-    pointerPan.type = null;
-    pointerPan.touchId = null;
-    container.classList.remove("is-grabbing");
+    resetPointerState();
     updateTransform();
   };
 
-  // --- Initial: pan.x = 30% der Bühnenbreite ---
+  const applyViewFromPreset = (viewConfig, origin = DEFAULT_TRANSFORM_ORIGIN) => {
+    const view = viewConfig ?? fallbackView;
+    const stageWidth = stage.offsetWidth;
+    const zoomValue =
+      typeof view.zoom === "number" ? view.zoom : fallbackView.zoom;
+    const panXFactor =
+      typeof view.panXFactor === "number"
+        ? view.panXFactor
+        : fallbackView.panXFactor;
+    const panX =
+      typeof view.panX === "number"
+        ? view.panX
+        : stageWidth * panXFactor;
+    const panYValue =
+      typeof view.panY === "number" ? view.panY : fallbackView.panY;
+
+    zoomLevel = clamp(zoomValue, MIN_ZOOM, MAX_ZOOM);
+    pan.x = panX;
+    pan.y = panYValue;
+
+    resetPointerState();
+    updateTransform(origin);
+  };
+
+  const applyInitialView = (origin = DEFAULT_TRANSFORM_ORIGIN) => {
+    const preset = getActivePreset();
+    applyViewFromPreset(preset.initial, origin);
+  };
+
+  const applyResetView = (origin = DEFAULT_TRANSFORM_ORIGIN) => {
+    const preset = getActivePreset();
+    applyViewFromPreset(preset.reset, origin);
+  };
+
+  const syncPresetFromBreakpoint = () => {
+    const nextKey = getPresetKey();
+    if (nextKey !== activePresetKey) {
+      activePresetKey = nextKey;
+      applyInitialView();
+    }
+  };
+
+  if (responsiveMediaQuery) {
+    if (typeof responsiveMediaQuery.addEventListener === "function") {
+      responsiveMediaQuery.addEventListener("change", syncPresetFromBreakpoint);
+    } else if (typeof responsiveMediaQuery.addListener === "function") {
+      responsiveMediaQuery.addListener(syncPresetFromBreakpoint);
+    }
+  }
+
+  // --- Initiales Ansichtspreset anwenden ---
   requestAnimationFrame(() => {
-    const stageWidth = stage.offsetWidth; // unskaliert, unabhängig vom aktuellen transform
-    pan.x = stageWidth * 0.3;
-    pan.y = 100;
-    updateTransform({ xPct: 50, yPct: 50 });
+    activePresetKey = getPresetKey();
+    applyInitialView();
   });
 
   // --- Mauswheel Zoom ---
@@ -134,25 +228,9 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
     { passive: false }
   );
 
-  // --- Doppelklick: Reset auf 30% ---
+  // --- Doppelklick: Ansicht zurücksetzen ---
   container.addEventListener("dblclick", () => {
-    // Erst Zoom zurücksetzen
-    zoomLevel = 1;
-
-    // Breite ohne Transform lesen, damit 30% stabil sind
-    const stageWidth = stage.offsetWidth;
-
-    // Pan auf 30% (x) und 0 (y)
-    pan.x = stageWidth * 0.3;
-    pan.y = 100;
-
-    // Pointer-Status zurücksetzen
-    pointerPan.active = false;
-    pointerPan.type = null;
-    pointerPan.touchId = null;
-    container.classList.remove("is-grabbing");
-
-    updateTransform({ xPct: 50, yPct: 50 });
+    applyResetView();
   });
 
   // --- Maus-Panning ---
@@ -300,5 +378,5 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
   });
 
   // Initiale Ausrichtung (Transform-Origin zentriert)
-  updateTransform({ xPct: 50, yPct: 50 });
+  updateTransform(DEFAULT_TRANSFORM_ORIGIN);
 }
