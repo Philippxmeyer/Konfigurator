@@ -313,7 +313,7 @@ select:focus-visible {
 
 .slider-field {
   margin: 0 0 18px 0;
-  transform: translate(0, -12px)
+  transform: translate(0, -1em)
 }
 
 .section .content .slider-field:last-of-type {
