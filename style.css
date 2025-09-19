@@ -38,7 +38,7 @@ button {
 .btn:hover {
   transform: translateY(-1px);
   background: linear-gradient(135deg, #ffffff, #eef1fb);
-  border-color: rgba(99, 102, 241, 0.5);
+  border-color: #009fE3;
   box-shadow: 0 20px 36px -22px rgba(15, 23, 42, 0.55);
 }
 
@@ -138,7 +138,7 @@ button {
   font-size: 0.95rem;
   text-align: center;
   letter-spacing: 0.02em;
-  /* background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  /* background: linear-gradient(135deg, #009fE3, #1d4ed8);
   border: none;
   color: #ffffff; */
   box-shadow: 0 18px 34px -20px rgba(37, 99, 235, 0.75);
@@ -167,7 +167,7 @@ button {
   overflow-y: auto;
   min-height: 0;
   background: #ffffff;
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border: 1px solid #009fE3;
   border-radius: 20px;
   box-shadow: 0 22px 40px -28px rgba(15, 23, 42, 0.45);
   display: flex;
@@ -219,8 +219,8 @@ button {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid #2563eb;
-  color: #2563eb;
+  border: 2px solid #009fE3;
+  color: #009fE3;
   background: #ffffff;
   font-size: 1rem;
   font-weight: 700;
@@ -256,8 +256,8 @@ button {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid rgba(37, 99, 235, 0.65);
-  color: rgba(29, 78, 216, 0.9);
+  border: 2px solid #009fE3;
+  color: #009fE3;
   background: #ffffff;
   font-size: 0.95rem;
   font-weight: 700;
@@ -312,7 +312,8 @@ select:focus-visible {
 }
 
 .slider-field {
-  margin: 6px 0 18px 0;
+  margin: 0 0 18px 0;
+  transform: translate(0, -12px)
 }
 
 .section .content .slider-field:last-of-type {
@@ -343,8 +344,8 @@ select:focus-visible {
   border-radius: 999px;
   background: linear-gradient(
     90deg,
-    #2563eb 0%,
-    #2563eb var(--slider-progress),
+    #009fE3 0%,
+    #009fE3 var(--slider-progress),
     rgba(148, 163, 184, 0.35) var(--slider-progress),
     rgba(148, 163, 184, 0.35) 100%
   );
@@ -359,7 +360,7 @@ select:focus-visible {
 .slider-field__input::-moz-range-progress {
   height: 6px;
   border-radius: 999px;
-  background: #2563eb;
+  background: #009fE3;
 }
 
 .slider-field__input::-webkit-slider-thumb {
@@ -367,7 +368,7 @@ select:focus-visible {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #2563eb;
+  background: #009fE3;
   border: 3px solid #eef2ff;
   box-shadow: 0 10px 18px -10px rgba(37, 99, 235, 0.6);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -378,7 +379,7 @@ select:focus-visible {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #2563eb;
+  background: #009fE3;
   border: 3px solid #eef2ff;
   box-shadow: 0 10px 18px -10px rgba(37, 99, 235, 0.6);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -433,19 +434,19 @@ select:focus-visible {
 
 .slider-field__tick {
   position: absolute;
-  width: 12px;
+  width: 3px;
   height: 12px;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
+  border-radius: 3px;
+  transform: translate(-50%, 50%);
   background: #e2e8f0;
   border: 2px solid rgba(148, 163, 184, 0.6);
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
 }
 
 .slider-field__tick.is-active {
-  background: #2563eb;
-  border-color: #1d4ed8;
-  box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.18);
+  background: #009fE3;
+  border-color: #009fE3;
+  box-shadow: 0 0 3px 4px rgba(37, 99, 235, 0.18);
   transform: translate(-50%, -50%) scale(1.08);
 }
 
@@ -464,7 +465,7 @@ select:focus-visible {
 }
 
 .slider-field__value {
-  margin-top: 8px;
+  /* margin-top: 8px; */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -475,6 +476,7 @@ select:focus-visible {
   font-weight: 600;
   font-size: 0.85rem;
   min-height: 24px;
+  transform: translate(65px, -50%);
 }
 
 .slider-field.is-disabled .slider-field__value {
@@ -577,7 +579,7 @@ select:focus-visible {
 
 .article-overlay__close:hover {
   background: rgba(241, 245, 255, 0.9);
-  border-color: rgba(59, 130, 246, 0.5);
+  border-color: #009fE3;
   color: #1d4ed8;
 }
 
@@ -751,7 +753,7 @@ select:focus-visible {
 }
 
 #copyBtn {
-  /* background: linear-gradient(135deg, #2563eb, #1d4ed8); */
+  /* background: linear-gradient(135deg, #009fE3, #1d4ed8); */
   border: none;
   color: #ffffff;
   font-size: 1.5em;
