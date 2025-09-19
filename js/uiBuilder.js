@@ -86,7 +86,14 @@ export function syncSliderControls() {
 }
 
 function createSliderControl(id, select) {
+
   const wrapper = document.createElement("div");
+
+  const valueDisplay = document.createElement("div");
+  valueDisplay.className = "slider-field__value";
+  valueDisplay.setAttribute("aria-live", "polite");
+  wrapper.appendChild(valueDisplay);
+
   wrapper.className = "slider-field";
 
   const track = document.createElement("div");
@@ -119,10 +126,7 @@ function createSliderControl(id, select) {
   track.appendChild(ticks);
   wrapper.appendChild(track);
 
-  const valueDisplay = document.createElement("div");
-  valueDisplay.className = "slider-field__value";
-  valueDisplay.setAttribute("aria-live", "polite");
-  wrapper.appendChild(valueDisplay);
+
 
   select.classList.add("slider-field__select");
   select.setAttribute("aria-hidden", "true");
