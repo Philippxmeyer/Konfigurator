@@ -4,6 +4,7 @@ body {
   line-height: 1.5;
   background: linear-gradient(180deg, #eef1f5 0%, #e4e7ed 100%);
   color: #1f2937;
+  overflow: hidden;
 }
 
 body.overlay-open {
