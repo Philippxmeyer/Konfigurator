@@ -7,6 +7,12 @@ body {
   overflow: hidden;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body.overlay-open {
   overflow: hidden;
 }
