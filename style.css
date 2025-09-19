@@ -807,6 +807,7 @@ select:focus-visible {
 @media (max-width: 1024px) {
   body {
     padding-top: 12px;
+    overflow: auto;
   }
 
   #logo-container {
