@@ -187,6 +187,7 @@ export function renderArticleList(values) {
     const submitBtn = document.createElement("button");
     submitBtn.type = "submit";
     submitBtn.className = "btn";
+    submitBtn.id ="submitBtn";
     submitBtn.textContent = "In den Warenkorb legen";
     form.appendChild(submitBtn);
 
