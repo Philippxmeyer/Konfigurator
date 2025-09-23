@@ -223,7 +223,11 @@ button {
 
 /* Plus/Minus für Gruppen */
 .group > h1::before {
-  content: "+";
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background: no-repeat center/contain url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='currentColor' viewBox='0 0 20 20'><path d='M10 5v10m5-5H5'/></svg>");
   position: absolute;
   left: 24px;
   top: 50%;
@@ -231,8 +235,8 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  /* width: 20px;
+  height: 20px; */
   /* border-radius: 50%; */
   /* border: 2px solid #009fE3; */
   color: #009fE3;
