@@ -178,7 +178,7 @@ button {
 
 .sidebar {
   flex: 1;
-  /* padding: 26px 24px; */
+  padding: 2px 0px;
   overflow-y: auto;
   min-height: 0;
   /* background: #ffffff; */
