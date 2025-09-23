@@ -43,8 +43,8 @@
 
   <options>
    <breiten>
-      <wert id="750">750 mm</wert>
-      <wert id="1500" default="true">1500 mm</wert>
+      <wert id="750" default="true">750 mm</wert>
+      <wert id="1500">1500 mm</wert>
       <wert id="2000">2000 mm</wert>
     </breiten>
     <gestelle>
@@ -60,10 +60,10 @@
       <wert id="weiss" default="true">Weiß</wert>
     </platten>
     <seitenblenden>
-      <wert id="ohne">ohne</wert>
+      <wert id="ohne" default="true">ohne</wert>
       <wert id="links">links</wert>
       <wert id="rechts">rechts</wert>
-      <wert id="links-rechts" default="true">links + rechts</wert>
+      <wert id="links-rechts">links + rechts</wert>
     </seitenblenden>
     <seitenfarben>
       <wert id="gestell" default="true">Gestellfarbe</wert>
@@ -71,27 +71,27 @@
       <wert id="anthrazit">Anthrazit</wert>
     </seitenfarben>
     <aufbauten>
-      <wert id="ohne">ohne</wert>
+      <wert id="ohne" default="true">ohne</wert>
       <wert id="niedrig">niedrig</wert>
-      <wert id="hoch" default="true">hoch</wert>
+      <wert id="hoch">hoch</wert>
     </aufbauten>
     <bodenanzahl>
-    <wert id="0">keiner</wert>
+    <wert id="0" default="true">keiner</wert>
     <wert id="1">1 Boden</wert>
-    <wert id="2" default="true">2 Böden</wert>
+    <wert id="2">2 Böden</wert>
     <wert id="3">3 Böden</wert>
     <wert id="4">4 Böden</wert>
   </bodenanzahl>
     <plattenanzahl>
-      <wert id="0">keine</wert>
-      <wert id="1" default="true">1 Platte</wert>
+      <wert id="0" default="true">keine</wert>
+      <wert id="1">1 Platte</wert>
       <wert id="2">2 Platten</wert>
       <wert id="3">3 Platten</wert>
     </plattenanzahl>
      <laufschienenanzahl>
-    <wert id="0">keine</wert>
+    <wert id="0" default="true">keine</wert>
     <wert id="1">1 Laufschiene</wert>
-    <wert id="2" default="true">2 Laufschienen</wert>
+    <wert id="2">2 Laufschienen</wert>
   </laufschienenanzahl> 
     <containerpos>
     <wert id="ohne" default="true">ohne</wert>
@@ -109,7 +109,7 @@
   <ablagebordOptionen>
   <wert id="ohne"  default="true">ohne</wert>
   <wert id="buche">Buche</wert>
-  <wert id="weiss" default="true">Weiß</wert>
+  <wert id="weiss">Weiß</wert>
 </ablagebordOptionen>
 
   </options>
