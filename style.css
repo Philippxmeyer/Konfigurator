@@ -894,7 +894,7 @@ select:focus-visible {
   }
 
   .sidebar {
-    padding: 22px 20px;
+    /* padding: 22px 20px; */
     max-height: none;
   }
 }
@@ -931,8 +931,8 @@ select:focus-visible {
   }
 
   .sidebar {
-    padding: 20px 16px;
-    /* border-radius: 16px; */
+    /* padding: 20px 16px;
+    border-radius: 16px; */
   }
 
   .article-overlay {
