@@ -19,11 +19,11 @@
       <section id="aufbau" title="Aufbauportal">
         <field id="aufbau" label="Variante" options="aufbauten"/>
       </section>
-      <section id="boeden" title="Verstellbare Böden">
-        <field id="bodenanzahl" label="Anzahl" options="bodenanzahl"/>
-      </section>
       <section id="platten" title="Lochrasterplatten">
         <field id="plattenanzahl" label="Anzahl" options="plattenanzahl"/>
+      </section>
+      <section id="boeden" title="Verstellbare Böden">
+        <field id="bodenanzahl" label="Anzahl" options="bodenanzahl"/>
       </section>
       <section id="laufschienen" title="Laufschienen">
     	<field id="laufschienenanzahl" label="Anzahl" options="laufschienenanzahl"/>
