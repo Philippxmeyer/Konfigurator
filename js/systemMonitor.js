@@ -15,6 +15,9 @@ const SCROLL_SPEED_VARIANCE = 42;
 const LEVEL_SCROLL_SPEED_STEP = 8;
 const LEVEL_AMPLITUDE_STEP = 6;
 const LEVEL_FREQUENCY_STEP = 0.08;
+const TOUCH_SWIPE_THRESHOLD = 14;
+const TOUCH_TAP_MAX_MOVEMENT = 12;
+const TOUCH_TAP_MAX_DURATION = 220;
 
 const ENEMY_IMAGE_PATHS = [
   "bilder/icons/400039.png",
@@ -130,7 +133,7 @@ function createOverlay() {
   const instructions = document.createElement("p");
   instructions.className = "diagnostics-overlay__instructions";
   instructions.textContent =
-    "Steuerung: ← → bewegen, Leertaste halten für Dauerfeuer, Enter startet neu (Level wechseln automatisch).";
+    "Steuerung: ← → bewegen, Leertaste halten für Dauerfeuer, Enter startet neu (Level wechseln automatisch). Touch: Tippen schießt, horizontales Wischen steuert.";
 
   body.append(canvas, instructions);
   header.append(title, close);
@@ -184,6 +187,8 @@ function createDiagnosticsController(canvas) {
   const width = canvas.width;
   const height = canvas.height;
 
+  canvas.style.touchAction = "none";
+
   const starLayers = [
     createStarLayer(26, 18, 30, "rgba(59, 130, 246, 0.2)"),
     createStarLayer(32, 28, 40, "rgba(248, 250, 252, 0.9)"),
@@ -203,6 +208,16 @@ function createDiagnosticsController(canvas) {
   const enemies = [];
   const keys = new Set();
   const enemyOrder = [];
+  const touchState = {
+    pointerId: null,
+    initialX: 0,
+    initialY: 0,
+    startX: 0,
+    startY: 0,
+    startTime: 0,
+    activeDirection: null,
+    moved: false,
+  };
   let level = 1;
   let defeatedCount = 0;
   let spawnTimer = 0;
@@ -214,6 +229,12 @@ function createDiagnosticsController(canvas) {
   let message = "";
   let messageAlpha = 0;
   let levelTransitionTimer = 0;
+
+  canvas.addEventListener("pointerdown", handlePointerDown, { passive: false });
+  canvas.addEventListener("pointermove", handlePointerMove, { passive: false });
+  canvas.addEventListener("pointerup", handlePointerUp, { passive: false });
+  canvas.addEventListener("pointercancel", handlePointerCancel, { passive: false });
+  canvas.addEventListener("pointerleave", handlePointerCancel, { passive: false });
 
   const keydownHandler = event => {
     if (!overlayElement?.classList.contains("is-open")) return;
@@ -267,6 +288,7 @@ function createDiagnosticsController(canvas) {
   }
 
   function start() {
+    resetTouchState();
     if (running) {
       resetGame();
       return;
@@ -289,6 +311,7 @@ function createDiagnosticsController(canvas) {
       frame = undefined;
     }
     keys.clear();
+    resetTouchState();
     message = "";
     messageAlpha = 0;
     levelTransitionTimer = 0;
@@ -307,22 +330,19 @@ function createDiagnosticsController(canvas) {
 
   function update(delta) {
     if (status === "playing") {
-      if (keys.has("ArrowLeft")) {
+      const movingLeft = keys.has("ArrowLeft") || touchState.activeDirection === "ArrowLeft";
+      const movingRight = keys.has("ArrowRight") || touchState.activeDirection === "ArrowRight";
+
+      if (movingLeft) {
         player.x -= player.speed * delta;
       }
-      if (keys.has("ArrowRight")) {
+      if (movingRight) {
         player.x += player.speed * delta;
       }
       player.x = Math.max(player.width / 2 + 10, Math.min(width - player.width / 2 - 10, player.x));
 
       if (keys.has("Space")) {
-        bullets.push({
-          x: player.x,
-          y: player.y - player.height / 2,
-          width: 4,
-          height: 12,
-          speed: 540,
-        });
+        fireBullet();
       }
 
       bullets.forEach(bullet => {
@@ -489,6 +509,124 @@ function createDiagnosticsController(canvas) {
       ctx.fillText(message, width / 2, height / 2 + 8);
       ctx.restore();
     }
+  }
+
+  function handlePointerDown(event) {
+    if (!isTouchPointer(event)) return;
+    if (!running) return;
+    if (touchState.pointerId !== null && touchState.pointerId !== event.pointerId) return;
+
+    event.preventDefault();
+    releaseTouchMovement();
+    touchState.pointerId = event.pointerId;
+    touchState.initialX = event.clientX;
+    touchState.initialY = event.clientY;
+    touchState.startX = event.clientX;
+    touchState.startY = event.clientY;
+    touchState.startTime = performance.now();
+    touchState.moved = false;
+
+    if (typeof canvas.setPointerCapture === "function") {
+      try {
+        canvas.setPointerCapture(event.pointerId);
+      } catch (error) {
+        // Browsers may throw if pointer capture is not supported.
+      }
+    }
+  }
+
+  function handlePointerMove(event) {
+    if (!isTouchPointer(event)) return;
+    if (touchState.pointerId !== event.pointerId) return;
+
+    event.preventDefault();
+
+    const totalDeltaX = Math.abs(event.clientX - touchState.initialX);
+    const totalDeltaY = Math.abs(event.clientY - touchState.initialY);
+    if (!touchState.moved && (totalDeltaX > TOUCH_TAP_MAX_MOVEMENT || totalDeltaY > TOUCH_TAP_MAX_MOVEMENT)) {
+      touchState.moved = true;
+    }
+
+    if (!running || status !== "playing") {
+      return;
+    }
+
+    const directionalDelta = event.clientX - touchState.startX;
+    if (Math.abs(directionalDelta) >= TOUCH_SWIPE_THRESHOLD) {
+      const direction = directionalDelta < 0 ? "ArrowLeft" : "ArrowRight";
+      if (touchState.activeDirection !== direction) {
+        touchState.activeDirection = direction;
+      }
+      touchState.moved = true;
+      touchState.startX = event.clientX;
+    }
+  }
+
+  function handlePointerUp(event) {
+    if (!isTouchPointer(event)) return;
+    if (touchState.pointerId !== event.pointerId) return;
+
+    event.preventDefault();
+
+    const wasMoved = touchState.moved;
+    const totalDeltaX = Math.abs(event.clientX - touchState.initialX);
+    const totalDeltaY = Math.abs(event.clientY - touchState.initialY);
+    const elapsed = performance.now() - touchState.startTime;
+    const isTap =
+      !wasMoved &&
+      totalDeltaX <= TOUCH_TAP_MAX_MOVEMENT &&
+      totalDeltaY <= TOUCH_TAP_MAX_MOVEMENT &&
+      elapsed <= TOUCH_TAP_MAX_DURATION;
+
+    resetTouchState();
+
+    if (isTap && status === "playing") {
+      fireBullet();
+    }
+  }
+
+  function handlePointerCancel(event) {
+    if (!isTouchPointer(event)) return;
+    if (touchState.pointerId !== event.pointerId) return;
+
+    event.preventDefault();
+    resetTouchState();
+  }
+
+  function isTouchPointer(event) {
+    return event.pointerType === "touch" || event.pointerType === "pen";
+  }
+
+  function releaseTouchMovement() {
+    touchState.activeDirection = null;
+  }
+
+  function resetTouchState() {
+    releaseTouchMovement();
+    if (touchState.pointerId !== null && typeof canvas.releasePointerCapture === "function") {
+      try {
+        canvas.releasePointerCapture(touchState.pointerId);
+      } catch (error) {
+        // Ignore if the pointer is no longer capturable.
+      }
+    }
+    touchState.pointerId = null;
+    touchState.initialX = 0;
+    touchState.initialY = 0;
+    touchState.startX = 0;
+    touchState.startY = 0;
+    touchState.startTime = 0;
+    touchState.moved = false;
+  }
+
+  function fireBullet() {
+    bullets.push({
+      x: player.x,
+      y: player.y - player.height / 2,
+      width: 4,
+      height: 12,
+      speed: 540,
+    });
   }
 
   return { start, stop };
