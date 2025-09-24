@@ -609,7 +609,7 @@ select:focus-visible {
 }
 
 .diagnostics-overlay__dialog {
-  width: min(92vw, 820px);
+  width: min(92vw, 760px);
   max-height: 88vh;
 }
 
@@ -620,7 +620,7 @@ select:focus-visible {
 }
 
 .diagnostics-overlay__canvas {
-  width: min(100%, 720px);
+  width: min(100%, 680px);
   height: auto;
   background: radial-gradient(circle at 30% 20%, rgba(148, 163, 184, 0.25), transparent 55%), #020617;
   border: 1px solid rgba(148, 163, 184, 0.35);
