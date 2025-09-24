@@ -3,6 +3,18 @@ const CLICK_WINDOW = 3000; // ms
 const OVERLAY_CLOSE_DELAY = 2000; // ms
 const OVERLAY_ID = "diagnosticsOverlay";
 const OVERLAY_TITLE_ID = "diagnosticsOverlayTitle";
+const ENEMIES_PER_LEVEL = 15;
+const LEVEL_TRANSITION_DELAY = 1.6; // seconds
+const SPAWN_BASE_DELAY = 0.64;
+const SPAWN_VARIANCE = 0.32;
+const SPAWN_PROGRESS_ACCELERATION = 0.32;
+const SPAWN_MIN_DELAY = 0.22;
+const SPAWN_LEVEL_MULTIPLIER = 0.88;
+const BASE_SCROLL_SPEED = 62;
+const SCROLL_SPEED_VARIANCE = 42;
+const LEVEL_SCROLL_SPEED_STEP = 8;
+const LEVEL_AMPLITUDE_STEP = 6;
+const LEVEL_FREQUENCY_STEP = 0.08;
 
 const ENEMY_IMAGE_PATHS = [
   "bilder/icons/400039.png",
@@ -117,7 +129,8 @@ function createOverlay() {
 
   const instructions = document.createElement("p");
   instructions.className = "diagnostics-overlay__instructions";
-  instructions.textContent = "Steuerung: ← → bewegen, Leertaste halten für Dauerfeuer, Enter startet neu.";
+  instructions.textContent =
+    "Steuerung: ← → bewegen, Leertaste halten für Dauerfeuer, Enter startet neu (Level wechseln automatisch).";
 
   body.append(canvas, instructions);
   header.append(title, close);
@@ -176,7 +189,7 @@ function createDiagnosticsController(canvas) {
     createStarLayer(32, 28, 40, "rgba(248, 250, 252, 0.9)"),
     createStarLayer(18, 42, 60, "rgba(125, 211, 252, 0.6)"),
   ];
-  const totalEnemies = ENEMY_IMAGES.length;
+  const totalEnemies = ENEMIES_PER_LEVEL;
 
   const player = {
     x: width / 2,
@@ -190,6 +203,7 @@ function createDiagnosticsController(canvas) {
   const enemies = [];
   const keys = new Set();
   const enemyOrder = [];
+  let level = 1;
   let defeatedCount = 0;
   let spawnTimer = 0;
   let nextEnemyIndex = 0;
@@ -199,13 +213,20 @@ function createDiagnosticsController(canvas) {
   let status = "idle";
   let message = "";
   let messageAlpha = 0;
+  let levelTransitionTimer = 0;
 
   const keydownHandler = event => {
     if (!overlayElement?.classList.contains("is-open")) return;
     const key = normalizeKey(event.key);
     if (!key) return;
 
-    if (status !== "playing" && (key === "Enter" || key === "Space")) {
+    if (status === "levelTransition" && key === "Enter") {
+      event.preventDefault();
+      initializeLevel(level + 1);
+      return;
+    }
+
+    if (status !== "playing" && status !== "levelTransition" && (key === "Enter" || key === "Space")) {
       event.preventDefault();
       resetGame();
       return;
@@ -224,17 +245,24 @@ function createDiagnosticsController(canvas) {
   };
 
   function resetGame() {
+    initializeLevel(1);
+  }
+
+  function initializeLevel(newLevel) {
+    level = newLevel;
     player.x = width / 2;
+    player.y = height - 40;
     bullets.length = 0;
     enemies.length = 0;
     status = "playing";
     message = "";
     messageAlpha = 0;
+    levelTransitionTimer = 0;
     keys.clear();
     enemyOrder.length = 0;
-    enemyOrder.push(...shuffleArray(ENEMY_IMAGES));
+    enemyOrder.push(...generateEnemyBatch());
     defeatedCount = 0;
-    spawnTimer = 0;
+    spawnTimer = computeSpawnDelay(level, 0);
     nextEnemyIndex = 0;
   }
 
@@ -261,6 +289,9 @@ function createDiagnosticsController(canvas) {
       frame = undefined;
     }
     keys.clear();
+    message = "";
+    messageAlpha = 0;
+    levelTransitionTimer = 0;
   }
 
   function loop(timestamp) {
@@ -337,7 +368,7 @@ function createDiagnosticsController(canvas) {
         }
         if (enemy.y - enemy.height / 2 > height) {
           status = "lost";
-          message = "Anomalie erkannt – Enter für neuen Scan";
+          message = `Anomalie auf Level ${level} erkannt – Enter für Neustart`;
           messageAlpha = 0;
         }
       }
@@ -349,17 +380,24 @@ function createDiagnosticsController(canvas) {
           if (!nextEnemyImage.complete) {
             spawnTimer = 0.3;
           } else {
-            enemies.push(createEnemy(nextEnemyImage, nextEnemyIndex));
+            enemies.push(createEnemy(nextEnemyImage, nextEnemyIndex, level));
             nextEnemyIndex += 1;
-            spawnTimer = 0.6 + Math.random() * 0.5;
+            const progressRatio = Math.min(nextEnemyIndex / totalEnemies, 1);
+            spawnTimer = computeSpawnDelay(level, progressRatio);
           }
         }
 
-        if (nextEnemyIndex >= enemyOrder.length && enemies.length === 0) {
-          status = "won";
-          message = "System stabilisiert – Enter für neue Messung";
+        if (defeatedCount >= totalEnemies && enemies.length === 0) {
+          status = "levelTransition";
+          message = `Level ${level} stabilisiert – Stufe ${level + 1} wird vorbereitet`;
           messageAlpha = 0;
+          levelTransitionTimer = LEVEL_TRANSITION_DELAY;
         }
+      }
+    } else if (status === "levelTransition") {
+      levelTransitionTimer -= delta;
+      if (levelTransitionTimer <= 0) {
+        initializeLevel(level + 1);
       }
     }
 
@@ -371,7 +409,9 @@ function createDiagnosticsController(canvas) {
 
     starLayers.forEach(layer => {
       layer.stars.forEach(star => {
-        star.y += star.speed * delta * (status === "playing" ? layer.parallax : layer.parallax * 0.6);
+        const parallaxFactor =
+          status === "playing" || status === "levelTransition" ? layer.parallax : layer.parallax * 0.6;
+        star.y += star.speed * delta * parallaxFactor;
         star.x += Math.sin((star.y + star.speed) * star.driftFrequency) * star.driftStrength;
         star.twinklePhase += delta * star.twinkleSpeed;
         if (star.y > height) {
@@ -406,7 +446,8 @@ function createDiagnosticsController(canvas) {
     ctx.fillStyle = "rgba(226, 232, 240, 0.82)";
     ctx.font = "14px 'Segoe UI', sans-serif";
     ctx.textAlign = "left";
-    ctx.fillText(`Analysefortschritt: ${Math.min(defeatedCount, totalEnemies)} / ${totalEnemies}`, 20, 26);
+    ctx.fillText(`Level ${level}`, 20, 26);
+    ctx.fillText(`Analysefortschritt: ${Math.min(defeatedCount, totalEnemies)} / ${totalEnemies}`, 20, 46);
     ctx.restore();
 
     ctx.fillStyle = "#7dd3fc";
@@ -428,14 +469,14 @@ function createDiagnosticsController(canvas) {
       ctx.save();
       ctx.translate(enemy.x, enemy.y);
       ctx.rotate(enemy.rotation);
-      const drawWidth = enemy.image.naturalWidth * enemy.scale;
-      const drawHeight = enemy.image.naturalHeight * enemy.scale;
+      const drawWidth = enemy.width;
+      const drawHeight = enemy.height;
       ctx.globalAlpha = Math.min(1, enemy.progress / 0.6);
       ctx.drawImage(enemy.image, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
       ctx.restore();
     });
 
-    if (status === "won" || status === "lost") {
+    if (message) {
       ctx.save();
       ctx.globalAlpha = messageAlpha;
       ctx.fillStyle = "rgba(15, 23, 42, 0.8)";
@@ -467,6 +508,29 @@ function createDiagnosticsController(canvas) {
     }
   }
 
+  function generateEnemyBatch() {
+    const result = [];
+    let pool = [];
+    while (result.length < ENEMIES_PER_LEVEL) {
+      if (pool.length === 0) {
+        pool = shuffleArray(ENEMY_IMAGES);
+      }
+      const next = pool.pop();
+      if (next) {
+        result.push(next);
+      }
+    }
+    return result;
+  }
+
+  function computeSpawnDelay(currentLevel, progressRatio) {
+    const normalizedProgress = Math.min(Math.max(progressRatio ?? 0, 0), 1);
+    const levelFactor = Math.pow(SPAWN_LEVEL_MULTIPLIER, Math.max(0, currentLevel - 1));
+    const randomizedDelay = (SPAWN_BASE_DELAY + Math.random() * SPAWN_VARIANCE) * levelFactor;
+    const acceleratedDelay = randomizedDelay - normalizedProgress * SPAWN_PROGRESS_ACCELERATION;
+    return Math.max(SPAWN_MIN_DELAY, acceleratedDelay);
+  }
+
   function createStarLayer(count, baseSpeed, speedVariance, color) {
     const match = color.match(/rgba?\(([^,]+,[^,]+,[^,]+)(?:,([^\)]+))?\)/);
     const channels = match ? match[1] : "248, 250, 252";
@@ -489,13 +553,14 @@ function createDiagnosticsController(canvas) {
     };
   }
 
-  function createEnemy(image, index) {
+  function createEnemy(image, index, currentLevel) {
     const scale = 0.4 + Math.random() * 0.25;
     const baseWidth = (image.naturalWidth || 96) * scale;
     const baseHeight = (image.naturalHeight || 96) * scale;
     const baseX = width * (0.2 + Math.random() * 0.6);
     const baseY = -baseHeight - Math.random() * 120;
     const pathType = index % 3;
+    const levelBoost = Math.max(0, currentLevel - 1);
     const enemy = {
       image,
       x: baseX,
@@ -507,9 +572,9 @@ function createDiagnosticsController(canvas) {
       scale,
       alive: true,
       progress: 0,
-      scrollSpeed: 70 + Math.random() * 50,
-      amplitude: 40 + Math.random() * 60,
-      waveFrequency: 0.9 + Math.random() * 0.5,
+      scrollSpeed: BASE_SCROLL_SPEED + Math.random() * SCROLL_SPEED_VARIANCE + levelBoost * LEVEL_SCROLL_SPEED_STEP,
+      amplitude: 40 + Math.random() * 60 + levelBoost * LEVEL_AMPLITUDE_STEP,
+      waveFrequency: 0.9 + Math.random() * 0.5 + levelBoost * LEVEL_FREQUENCY_STEP,
       waveOffset: Math.random() * Math.PI * 2,
       rotation: 0,
       pathType,
