@@ -3,8 +3,23 @@ const CLICK_WINDOW = 3000; // ms
 const OVERLAY_CLOSE_DELAY = 2000; // ms
 const OVERLAY_ID = "diagnosticsOverlay";
 const OVERLAY_TITLE_ID = "diagnosticsOverlayTitle";
+const PROCESSES_PER_LEVEL = 15;
+const LEVEL_HANDOVER_DELAY = 1.6; // seconds
+const REFRESH_BASE_DELAY = 0.64;
+const REFRESH_VARIANCE = 0.32;
+const REFRESH_PROGRESS_ACCELERATION = 0.32;
+const REFRESH_MIN_DELAY = 0.22;
+const REFRESH_LEVEL_MULTIPLIER = 0.88;
+const BASE_SCROLL_SPEED = 62;
+const SCROLL_SPEED_VARIANCE = 42;
+const LEVEL_SCROLL_SPEED_STEP = 8;
+const LEVEL_LATERAL_STEP = 6;
+const LEVEL_FREQUENCY_STEP = 0.08;
+const TOUCH_SWIPE_THRESHOLD = 14;
+const TOUCH_TAP_MAX_MOVEMENT = 12;
+const TOUCH_TAP_MAX_DURATION = 220;
 
-const ENEMY_IMAGE_PATHS = [
+const PROCESS_IMAGE_PATHS = [
   "bilder/icons/400039.png",
   "bilder/icons/403808.png",
   "bilder/icons/403809.png",
@@ -25,7 +40,7 @@ const ENEMY_IMAGE_PATHS = [
   "bilder/icons/404795.png",
 ];
 
-const ENEMY_IMAGES = ENEMY_IMAGE_PATHS.map(src => {
+const PROCESS_IMAGES = PROCESS_IMAGE_PATHS.map(src => {
   const img = new Image();
   img.src = src;
   return img;
@@ -35,7 +50,7 @@ let clickHistory = [];
 let overlayElement;
 let closeButton;
 let canvasElement;
-let gameController;
+let diagController;
 let lastFocusedElement = null;
 let overlayOpenedAt = 0;
 
@@ -117,7 +132,8 @@ function createOverlay() {
 
   const instructions = document.createElement("p");
   instructions.className = "diagnostics-overlay__instructions";
-  instructions.textContent = "Steuerung: ← → bewegen, Leertaste halten für Dauerfeuer, Enter startet neu.";
+  instructions.textContent =
+    "Bedienung: ← → justieren den Cursor, Leertaste sendet kontinuierlich Pakete, Enter initialisiert die Analyse neu (Stufen wechseln automatisch). Touch: Tippen dispatcht Pakete, horizontales Wischen verschiebt den Cursor.";
 
   body.append(canvas, instructions);
   header.append(title, close);
@@ -137,10 +153,10 @@ function openOverlay() {
   document.body.classList.add("overlay-open");
   overlayOpenedAt = performance.now();
 
-  if (!gameController) {
-    gameController = createDiagnosticsController(canvasElement);
+  if (!diagController) {
+    diagController = createDiagnosticsController(canvasElement);
   }
-  gameController.start();
+  diagController.start();
 
   if (closeButton instanceof HTMLElement) {
     closeButton.focus();
@@ -157,7 +173,7 @@ function closeOverlay() {
     document.body.classList.remove("overlay-open");
   }
 
-  gameController?.stop();
+  diagController?.stop();
 
   if (lastFocusedElement) {
     lastFocusedElement.focus();
@@ -171,14 +187,16 @@ function createDiagnosticsController(canvas) {
   const width = canvas.width;
   const height = canvas.height;
 
+  canvas.style.touchAction = "none";
+
   const starLayers = [
     createStarLayer(26, 18, 30, "rgba(59, 130, 246, 0.2)"),
     createStarLayer(32, 28, 40, "rgba(248, 250, 252, 0.9)"),
     createStarLayer(18, 42, 60, "rgba(125, 211, 252, 0.6)"),
   ];
-  const totalEnemies = ENEMY_IMAGES.length;
+  const totalProcesses = PROCESSES_PER_LEVEL;
 
-  const player = {
+  const cursor = {
     x: width / 2,
     y: height - 40,
     width: 46,
@@ -186,28 +204,52 @@ function createDiagnosticsController(canvas) {
     speed: 320,
   };
 
-  const bullets = [];
-  const enemies = [];
+  const packets = [];
+  const processes = [];
   const keys = new Set();
-  const enemyOrder = [];
-  let defeatedCount = 0;
-  let spawnTimer = 0;
-  let nextEnemyIndex = 0;
+  const processOrder = [];
+  const touchState = {
+    pointerId: null,
+    initialX: 0,
+    initialY: 0,
+    startX: 0,
+    startY: 0,
+    startTime: 0,
+    activeDirection: null,
+    moved: false,
+  };
+  let level = 1;
+  let analyzedCount = 0;
+  let refreshTimer = 0;
+  let nextProcessIndex = 0;
   let lastTime = 0;
   let frame;
   let running = false;
-  let status = "idle";
-  let message = "";
-  let messageAlpha = 0;
+  let scanState = "idle";
+  let statusMsg = "";
+  let statusMsgAlpha = 0;
+  let handoverTimer = 0;
+
+  canvas.addEventListener("pointerdown", handlePointerDown, { passive: false });
+  canvas.addEventListener("pointermove", handlePointerMove, { passive: false });
+  canvas.addEventListener("pointerup", handlePointerUp, { passive: false });
+  canvas.addEventListener("pointercancel", handlePointerCancel, { passive: false });
+  canvas.addEventListener("pointerleave", handlePointerCancel, { passive: false });
 
   const keydownHandler = event => {
     if (!overlayElement?.classList.contains("is-open")) return;
     const key = normalizeKey(event.key);
     if (!key) return;
 
-    if (status !== "playing" && (key === "Enter" || key === "Space")) {
+    if (scanState === "handover" && key === "Enter") {
       event.preventDefault();
-      resetGame();
+      initializeStage(level + 1);
+      return;
+    }
+
+    if (scanState !== "scanning" && scanState !== "handover" && (key === "Enter" || key === "Space")) {
+      event.preventDefault();
+      resetScan();
       return;
     }
 
@@ -223,27 +265,35 @@ function createDiagnosticsController(canvas) {
     keys.delete(key);
   };
 
-  function resetGame() {
-    player.x = width / 2;
-    bullets.length = 0;
-    enemies.length = 0;
-    status = "playing";
-    message = "";
-    messageAlpha = 0;
+  function resetScan() {
+    initializeStage(1);
+  }
+
+  function initializeStage(newLevel) {
+    level = newLevel;
+    cursor.x = width / 2;
+    cursor.y = height - 40;
+    packets.length = 0;
+    processes.length = 0;
+    scanState = "scanning";
+    statusMsg = "";
+    statusMsgAlpha = 0;
+    handoverTimer = 0;
     keys.clear();
-    enemyOrder.length = 0;
-    enemyOrder.push(...shuffleArray(ENEMY_IMAGES));
-    defeatedCount = 0;
-    spawnTimer = 0;
-    nextEnemyIndex = 0;
+    processOrder.length = 0;
+    processOrder.push(...generateProcessBatch());
+    analyzedCount = 0;
+    refreshTimer = computeRefreshDelay(level, 0);
+    nextProcessIndex = 0;
   }
 
   function start() {
+    resetTouchState();
     if (running) {
-      resetGame();
+      resetScan();
       return;
     }
-    resetGame();
+    resetScan();
     running = true;
     lastTime = performance.now();
     window.addEventListener("keydown", keydownHandler);
@@ -253,7 +303,7 @@ function createDiagnosticsController(canvas) {
 
   function stop() {
     running = false;
-    status = "idle";
+    scanState = "idle";
     window.removeEventListener("keydown", keydownHandler);
     window.removeEventListener("keyup", keyupHandler);
     if (typeof frame === "number") {
@@ -261,6 +311,10 @@ function createDiagnosticsController(canvas) {
       frame = undefined;
     }
     keys.clear();
+    resetTouchState();
+    statusMsg = "";
+    statusMsgAlpha = 0;
+    handoverTimer = 0;
   }
 
   function loop(timestamp) {
@@ -275,103 +329,109 @@ function createDiagnosticsController(canvas) {
   }
 
   function update(delta) {
-    if (status === "playing") {
-      if (keys.has("ArrowLeft")) {
-        player.x -= player.speed * delta;
+    if (scanState === "scanning") {
+      const movingLeft = keys.has("ArrowLeft") || touchState.activeDirection === "ArrowLeft";
+      const movingRight = keys.has("ArrowRight") || touchState.activeDirection === "ArrowRight";
+
+      if (movingLeft) {
+        cursor.x -= cursor.speed * delta;
       }
-      if (keys.has("ArrowRight")) {
-        player.x += player.speed * delta;
+      if (movingRight) {
+        cursor.x += cursor.speed * delta;
       }
-      player.x = Math.max(player.width / 2 + 10, Math.min(width - player.width / 2 - 10, player.x));
+      cursor.x = Math.max(cursor.width / 2 + 10, Math.min(width - cursor.width / 2 - 10, cursor.x));
 
       if (keys.has("Space")) {
-        bullets.push({
-          x: player.x,
-          y: player.y - player.height / 2,
-          width: 4,
-          height: 12,
-          speed: 540,
-        });
+        emitPacket();
       }
 
-      bullets.forEach(bullet => {
-        bullet.y -= bullet.speed * delta;
+      packets.forEach(packet => {
+        packet.y -= packet.speed * delta;
       });
-      for (let i = bullets.length - 1; i >= 0; i -= 1) {
-        if (bullets[i].y + bullets[i].height < 0) {
-          bullets.splice(i, 1);
+      for (let i = packets.length - 1; i >= 0; i -= 1) {
+        if (packets[i].y + packets[i].height < 0) {
+          packets.splice(i, 1);
         }
       }
 
-      for (let i = enemies.length - 1; i >= 0; i -= 1) {
-        const enemy = enemies[i];
-        if (!enemy.alive) {
-          enemies.splice(i, 1);
+      for (let i = processes.length - 1; i >= 0; i -= 1) {
+        const proc = processes[i];
+        if (!proc.active) {
+          processes.splice(i, 1);
           continue;
         }
-        updateEnemy(enemy, delta);
+        updateProcess(proc, delta);
       }
 
-      for (let b = bullets.length - 1; b >= 0; b -= 1) {
-        const bullet = bullets[b];
+      for (let b = packets.length - 1; b >= 0; b -= 1) {
+        const packet = packets[b];
         let hit = false;
-        for (let i = 0; i < enemies.length; i += 1) {
-          const enemy = enemies[i];
-          if (isBulletColliding(bullet, enemy)) {
-            enemy.alive = false;
-            defeatedCount += 1;
+        for (let i = 0; i < processes.length; i += 1) {
+          const proc = processes[i];
+          if (isPacketColliding(packet, proc)) {
+            proc.active = false;
+            analyzedCount += 1;
             hit = true;
             break;
           }
         }
         if (hit) {
-          bullets.splice(b, 1);
+          packets.splice(b, 1);
         }
       }
 
-      for (let i = enemies.length - 1; i >= 0; i -= 1) {
-        const enemy = enemies[i];
-        if (!enemy.alive) {
-          enemies.splice(i, 1);
+      for (let i = processes.length - 1; i >= 0; i -= 1) {
+        const proc = processes[i];
+        if (!proc.active) {
+          processes.splice(i, 1);
           continue;
         }
-        if (enemy.y - enemy.height / 2 > height) {
-          status = "lost";
-          message = "Anomalie erkannt – Enter für neuen Scan";
-          messageAlpha = 0;
+        if (proc.y - proc.height / 2 > height) {
+          scanState = "anomaly";
+          statusMsg = `Anomalie in Analyse-Stufe ${level} erkannt – Enter initialisiert neu`;
+          statusMsgAlpha = 0;
         }
       }
 
-      if (status === "playing") {
-        spawnTimer -= delta;
-        if (spawnTimer <= 0 && nextEnemyIndex < enemyOrder.length && enemies.length === 0) {
-          const nextEnemyImage = enemyOrder[nextEnemyIndex];
-          if (!nextEnemyImage.complete) {
-            spawnTimer = 0.3;
+      if (scanState === "scanning") {
+        refreshTimer -= delta;
+        if (refreshTimer <= 0 && nextProcessIndex < processOrder.length && processes.length === 0) {
+          const nextProcessImage = processOrder[nextProcessIndex];
+          if (!nextProcessImage.complete) {
+            refreshTimer = 0.3;
           } else {
-            enemies.push(createEnemy(nextEnemyImage, nextEnemyIndex));
-            nextEnemyIndex += 1;
-            spawnTimer = 0.6 + Math.random() * 0.5;
+            processes.push(createProcess(nextProcessImage, nextProcessIndex, level));
+            nextProcessIndex += 1;
+            const progressRatio = Math.min(nextProcessIndex / totalProcesses, 1);
+            refreshTimer = computeRefreshDelay(level, progressRatio);
           }
         }
 
-        if (nextEnemyIndex >= enemyOrder.length && enemies.length === 0) {
-          status = "won";
-          message = "System stabilisiert – Enter für neue Messung";
-          messageAlpha = 0;
+        if (analyzedCount >= totalProcesses && processes.length === 0) {
+          scanState = "handover";
+          statusMsg = `Analyse-Stufe ${level} stabilisiert – Stufe ${level + 1} wird vorbereitet`;
+          statusMsgAlpha = 0;
+          handoverTimer = LEVEL_HANDOVER_DELAY;
         }
+      }
+    } else if (scanState === "handover") {
+      handoverTimer -= delta;
+      if (handoverTimer <= 0) {
+        initializeStage(level + 1);
       }
     }
 
-    if (message) {
-      messageAlpha = Math.min(messageAlpha + delta * 0.7, 1);
+    if (statusMsg) {
+      statusMsgAlpha = Math.min(statusMsgAlpha + delta * 0.7, 1);
     } else {
-      messageAlpha = 0;
+      statusMsgAlpha = 0;
     }
 
     starLayers.forEach(layer => {
       layer.stars.forEach(star => {
-        star.y += star.speed * delta * (status === "playing" ? layer.parallax : layer.parallax * 0.6);
+        const parallaxFactor =
+          scanState === "scanning" || scanState === "handover" ? layer.parallax : layer.parallax * 0.6;
+        star.y += star.speed * delta * parallaxFactor;
         star.x += Math.sin((star.y + star.speed) * star.driftFrequency) * star.driftStrength;
         star.twinklePhase += delta * star.twinkleSpeed;
         if (star.y > height) {
@@ -406,38 +466,39 @@ function createDiagnosticsController(canvas) {
     ctx.fillStyle = "rgba(226, 232, 240, 0.82)";
     ctx.font = "14px 'Segoe UI', sans-serif";
     ctx.textAlign = "left";
-    ctx.fillText(`Analysefortschritt: ${Math.min(defeatedCount, totalEnemies)} / ${totalEnemies}`, 20, 26);
+    ctx.fillText(`Analyse-Stufe ${level}`, 20, 26);
+    ctx.fillText(`Analysefortschritt: ${Math.min(analyzedCount, totalProcesses)} / ${totalProcesses}`, 20, 46);
     ctx.restore();
 
     ctx.fillStyle = "#7dd3fc";
     ctx.beginPath();
-    ctx.moveTo(player.x, player.y - player.height / 2);
-    ctx.lineTo(player.x - player.width / 2, player.y + player.height / 2);
-    ctx.lineTo(player.x + player.width / 2, player.y + player.height / 2);
+    ctx.moveTo(cursor.x, cursor.y - cursor.height / 2);
+    ctx.lineTo(cursor.x - cursor.width / 2, cursor.y + cursor.height / 2);
+    ctx.lineTo(cursor.x + cursor.width / 2, cursor.y + cursor.height / 2);
     ctx.closePath();
     ctx.fill();
 
     ctx.fillStyle = "#f8fafc";
-    bullets.forEach(bullet => {
-      ctx.fillRect(bullet.x - bullet.width / 2, bullet.y - bullet.height, bullet.width, bullet.height);
+    packets.forEach(packet => {
+      ctx.fillRect(packet.x - packet.width / 2, packet.y - packet.height, packet.width, packet.height);
     });
 
-    enemies.forEach(enemy => {
-      if (!enemy.alive) return;
-      if (!enemy.image.complete) return;
+    processes.forEach(proc => {
+      if (!proc.active) return;
+      if (!proc.image.complete) return;
       ctx.save();
-      ctx.translate(enemy.x, enemy.y);
-      ctx.rotate(enemy.rotation);
-      const drawWidth = enemy.image.naturalWidth * enemy.scale;
-      const drawHeight = enemy.image.naturalHeight * enemy.scale;
-      ctx.globalAlpha = Math.min(1, enemy.progress / 0.6);
-      ctx.drawImage(enemy.image, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+      ctx.translate(proc.x, proc.y);
+      ctx.rotate(proc.rotation);
+      const drawWidth = proc.width;
+      const drawHeight = proc.height;
+      ctx.globalAlpha = Math.min(1, proc.progress / 0.6);
+      ctx.drawImage(proc.image, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
       ctx.restore();
     });
 
-    if (status === "won" || status === "lost") {
+    if (statusMsg) {
       ctx.save();
-      ctx.globalAlpha = messageAlpha;
+      ctx.globalAlpha = statusMsgAlpha;
       ctx.fillStyle = "rgba(15, 23, 42, 0.8)";
       ctx.fillRect(width / 2 - 180, height / 2 - 60, 360, 120);
       ctx.strokeStyle = "rgba(148, 163, 184, 0.6)";
@@ -445,9 +506,127 @@ function createDiagnosticsController(canvas) {
       ctx.fillStyle = "#e2e8f0";
       ctx.font = "20px 'Segoe UI', sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText(message, width / 2, height / 2 + 8);
+      ctx.fillText(statusMsg, width / 2, height / 2 + 8);
       ctx.restore();
     }
+  }
+
+  function handlePointerDown(event) {
+    if (!isTouchPointer(event)) return;
+    if (!running) return;
+    if (touchState.pointerId !== null && touchState.pointerId !== event.pointerId) return;
+
+    event.preventDefault();
+    releaseTouchMovement();
+    touchState.pointerId = event.pointerId;
+    touchState.initialX = event.clientX;
+    touchState.initialY = event.clientY;
+    touchState.startX = event.clientX;
+    touchState.startY = event.clientY;
+    touchState.startTime = performance.now();
+    touchState.moved = false;
+
+    if (typeof canvas.setPointerCapture === "function") {
+      try {
+        canvas.setPointerCapture(event.pointerId);
+      } catch (error) {
+        // Browsers may throw if pointer capture is not supported.
+      }
+    }
+  }
+
+  function handlePointerMove(event) {
+    if (!isTouchPointer(event)) return;
+    if (touchState.pointerId !== event.pointerId) return;
+
+    event.preventDefault();
+
+    const totalDeltaX = Math.abs(event.clientX - touchState.initialX);
+    const totalDeltaY = Math.abs(event.clientY - touchState.initialY);
+    if (!touchState.moved && (totalDeltaX > TOUCH_TAP_MAX_MOVEMENT || totalDeltaY > TOUCH_TAP_MAX_MOVEMENT)) {
+      touchState.moved = true;
+    }
+
+    if (!running || scanState !== "scanning") {
+      return;
+    }
+
+    const directionalDelta = event.clientX - touchState.startX;
+    if (Math.abs(directionalDelta) >= TOUCH_SWIPE_THRESHOLD) {
+      const direction = directionalDelta < 0 ? "ArrowLeft" : "ArrowRight";
+      if (touchState.activeDirection !== direction) {
+        touchState.activeDirection = direction;
+      }
+      touchState.moved = true;
+      touchState.startX = event.clientX;
+    }
+  }
+
+  function handlePointerUp(event) {
+    if (!isTouchPointer(event)) return;
+    if (touchState.pointerId !== event.pointerId) return;
+
+    event.preventDefault();
+
+    const wasMoved = touchState.moved;
+    const totalDeltaX = Math.abs(event.clientX - touchState.initialX);
+    const totalDeltaY = Math.abs(event.clientY - touchState.initialY);
+    const elapsed = performance.now() - touchState.startTime;
+    const isTap =
+      !wasMoved &&
+      totalDeltaX <= TOUCH_TAP_MAX_MOVEMENT &&
+      totalDeltaY <= TOUCH_TAP_MAX_MOVEMENT &&
+      elapsed <= TOUCH_TAP_MAX_DURATION;
+
+    resetTouchState();
+
+    if (isTap && scanState === "scanning") {
+      emitPacket();
+    }
+  }
+
+  function handlePointerCancel(event) {
+    if (!isTouchPointer(event)) return;
+    if (touchState.pointerId !== event.pointerId) return;
+
+    event.preventDefault();
+    resetTouchState();
+  }
+
+  function isTouchPointer(event) {
+    return event.pointerType === "touch" || event.pointerType === "pen";
+  }
+
+  function releaseTouchMovement() {
+    touchState.activeDirection = null;
+  }
+
+  function resetTouchState() {
+    releaseTouchMovement();
+    if (touchState.pointerId !== null && typeof canvas.releasePointerCapture === "function") {
+      try {
+        canvas.releasePointerCapture(touchState.pointerId);
+      } catch (error) {
+        // Ignore if the pointer is no longer capturable.
+      }
+    }
+    touchState.pointerId = null;
+    touchState.initialX = 0;
+    touchState.initialY = 0;
+    touchState.startX = 0;
+    touchState.startY = 0;
+    touchState.startTime = 0;
+    touchState.moved = false;
+  }
+
+  function emitPacket() {
+    packets.push({
+      x: cursor.x,
+      y: cursor.y - cursor.height / 2,
+      width: 4,
+      height: 12,
+      speed: 540,
+    });
   }
 
   return { start, stop };
@@ -465,6 +644,29 @@ function createDiagnosticsController(canvas) {
       default:
         return null;
     }
+  }
+
+  function generateProcessBatch() {
+    const result = [];
+    let pool = [];
+    while (result.length < PROCESSES_PER_LEVEL) {
+      if (pool.length === 0) {
+        pool = shuffleArray(PROCESS_IMAGES);
+      }
+      const next = pool.pop();
+      if (next) {
+        result.push(next);
+      }
+    }
+    return result;
+  }
+
+  function computeRefreshDelay(currentLevel, progressRatio) {
+    const normalizedProgress = Math.min(Math.max(progressRatio ?? 0, 0), 1);
+    const levelFactor = Math.pow(REFRESH_LEVEL_MULTIPLIER, Math.max(0, currentLevel - 1));
+    const randomizedDelay = (REFRESH_BASE_DELAY + Math.random() * REFRESH_VARIANCE) * levelFactor;
+    const acceleratedDelay = randomizedDelay - normalizedProgress * REFRESH_PROGRESS_ACCELERATION;
+    return Math.max(REFRESH_MIN_DELAY, acceleratedDelay);
   }
 
   function createStarLayer(count, baseSpeed, speedVariance, color) {
@@ -489,14 +691,18 @@ function createDiagnosticsController(canvas) {
     };
   }
 
-  function createEnemy(image, index) {
+  function createProcess(image, index, currentLevel) {
     const scale = 0.4 + Math.random() * 0.25;
     const baseWidth = (image.naturalWidth || 96) * scale;
     const baseHeight = (image.naturalHeight || 96) * scale;
     const baseX = width * (0.2 + Math.random() * 0.6);
     const baseY = -baseHeight - Math.random() * 120;
     const pathType = index % 3;
-    const enemy = {
+    const levelBoost = Math.max(0, currentLevel - 1);
+    const lateralLimit = width * 0.2;
+    const lateralSeed = 28 + Math.random() * 42 + levelBoost * LEVEL_LATERAL_STEP;
+    const lateralRange = Math.min(lateralLimit, lateralSeed);
+    const proc = {
       image,
       x: baseX,
       y: baseY,
@@ -505,11 +711,11 @@ function createDiagnosticsController(canvas) {
       width: baseWidth,
       height: baseHeight,
       scale,
-      alive: true,
+      active: true,
       progress: 0,
-      scrollSpeed: 70 + Math.random() * 50,
-      amplitude: 40 + Math.random() * 60,
-      waveFrequency: 0.9 + Math.random() * 0.5,
+      scrollSpeed: BASE_SCROLL_SPEED + Math.random() * SCROLL_SPEED_VARIANCE + levelBoost * LEVEL_SCROLL_SPEED_STEP,
+      lateralRange,
+      waveFrequency: 0.9 + Math.random() * 0.5 + levelBoost * LEVEL_FREQUENCY_STEP,
       waveOffset: Math.random() * Math.PI * 2,
       rotation: 0,
       pathType,
@@ -519,56 +725,69 @@ function createDiagnosticsController(canvas) {
       image.addEventListener(
         "load",
         () => {
-          enemy.width = (image.naturalWidth || 96) * enemy.scale;
-          enemy.height = (image.naturalHeight || 96) * enemy.scale;
+          proc.width = (image.naturalWidth || 96) * proc.scale;
+          proc.height = (image.naturalHeight || 96) * proc.scale;
         },
         { once: true },
       );
     }
 
-    return enemy;
+    return proc;
   }
 
-  function updateEnemy(enemy, delta) {
-    enemy.progress += delta;
-    const t = enemy.progress;
-    const baseY = enemy.baseY + enemy.scrollSpeed * t * 1.1;
+  function updateProcess(proc, delta) {
+    proc.progress += delta;
+    const t = proc.progress;
+    const baseY = proc.baseY + proc.scrollSpeed * t * 1.1;
+    const lateralLimit = width * 0.2;
+    let targetX = proc.baseX;
+    let targetY = baseY;
 
-    switch (enemy.pathType) {
+    switch (proc.pathType) {
       case 0: {
-        const horizontal = Math.sin(t * enemy.waveFrequency + enemy.waveOffset) * enemy.amplitude;
-        const vertical = Math.cos(t * (enemy.waveFrequency * 0.6) + enemy.waveOffset) * 12;
-        enemy.x = enemy.baseX + horizontal;
-        enemy.y = baseY + vertical;
+        const lateral = Math.sin(t * proc.waveFrequency + proc.waveOffset) * proc.lateralRange;
+        const vertical = Math.cos(t * (proc.waveFrequency * 0.6) + proc.waveOffset) * 12;
+        targetX = proc.baseX + lateral;
+        targetY = baseY + vertical;
         break;
       }
       case 1: {
-        const orbitRadius = enemy.amplitude + 50;
-        enemy.x = width / 2 + Math.sin(t * (enemy.waveFrequency + 0.6) + enemy.waveOffset) * orbitRadius;
-        enemy.y = baseY + Math.cos(t * (enemy.waveFrequency + 0.4) + enemy.waveOffset) * 24;
+        const orbitRadius = Math.min(lateralLimit, proc.lateralRange * 0.9 + width * 0.04);
+        targetX = width / 2 + Math.sin(t * (proc.waveFrequency + 0.6) + proc.waveOffset) * orbitRadius;
+        targetY = baseY + Math.cos(t * (proc.waveFrequency + 0.4) + proc.waveOffset) * 24;
         break;
       }
       default: {
-        const horizontal = Math.sin(t * (enemy.waveFrequency * 2.4) + enemy.waveOffset) * (enemy.amplitude + 80);
-        const vertical = Math.sin(t * (enemy.waveFrequency * 1.7) + enemy.waveOffset * 1.3) * 18;
-        enemy.x = enemy.baseX + horizontal;
-        enemy.y = baseY + vertical;
+        const compositeRange = Math.min(lateralLimit, proc.lateralRange * 1.15 + width * 0.02);
+        const lateral = Math.sin(t * (proc.waveFrequency * 2.1) + proc.waveOffset) * compositeRange;
+        const vertical = Math.sin(t * (proc.waveFrequency * 1.6) + proc.waveOffset * 1.3) * 18;
+        targetX = proc.baseX + lateral;
+        targetY = baseY + vertical;
         break;
       }
     }
 
-    enemy.x = Math.max(enemy.width / 2 + 16, Math.min(width - enemy.width / 2 - 16, enemy.x));
-    enemy.rotation = Math.sin(t * 1.8 + enemy.waveOffset) * 0.35;
+    const originX = proc.pathType === 1 ? width / 2 : proc.baseX;
+    const clampLeft = originX - lateralLimit;
+    const clampRight = originX + lateralLimit;
+    let clampedX = Math.max(clampLeft, Math.min(clampRight, targetX));
+    const screenLeft = proc.width / 2 + 16;
+    const screenRight = width - proc.width / 2 - 16;
+    clampedX = Math.max(screenLeft, Math.min(screenRight, clampedX));
+
+    proc.x = clampedX;
+    proc.y = targetY;
+    proc.rotation = Math.sin(t * 1.6 + proc.waveOffset) * 0.24;
   }
 
-  function isBulletColliding(bullet, enemy) {
-    const halfWidth = enemy.width / 2;
-    const halfHeight = enemy.height / 2;
+  function isPacketColliding(packet, proc) {
+    const halfWidth = proc.width / 2;
+    const halfHeight = proc.height / 2;
     return (
-      bullet.x >= enemy.x - halfWidth &&
-      bullet.x <= enemy.x + halfWidth &&
-      bullet.y <= enemy.y + halfHeight &&
-      bullet.y + bullet.height >= enemy.y - halfHeight
+      packet.x >= proc.x - halfWidth &&
+      packet.x <= proc.x + halfWidth &&
+      packet.y <= proc.y + halfHeight &&
+      packet.y + packet.height >= proc.y - halfHeight
     );
   }
 
