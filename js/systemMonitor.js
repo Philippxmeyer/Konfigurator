@@ -1,7 +1,68 @@
 const CLICK_THRESHOLD = 10;
 const CLICK_WINDOW = 3000; // ms
+const OVERLAY_CLOSE_DELAY = 2000; // ms
 const OVERLAY_ID = "diagnosticsOverlay";
 const OVERLAY_TITLE_ID = "diagnosticsOverlayTitle";
+
+const ENEMY_IMAGE_PATHS = [
+  "bilder/icons/400039.png",
+  "bilder/icons/400049.png",
+  "bilder/icons/400059.png",
+  "bilder/icons/402964.png",
+  "bilder/icons/402965.png",
+  "bilder/icons/402966.png",
+  "bilder/icons/402975.png",
+  "bilder/icons/402976.png",
+  "bilder/icons/402977.png",
+  "bilder/icons/402978.png",
+  "bilder/icons/402979.png",
+  "bilder/icons/402980.png",
+  "bilder/icons/403808.png",
+  "bilder/icons/403809.png",
+  "bilder/icons/403810.png",
+  "bilder/icons/403812.png",
+  "bilder/icons/403813.png",
+  "bilder/icons/403814.png",
+  "bilder/icons/403816.png",
+  "bilder/icons/403817.png",
+  "bilder/icons/403818.png",
+  "bilder/icons/403820.png",
+  "bilder/icons/403822.png",
+  "bilder/icons/403824.png",
+  "bilder/icons/403834.png",
+  "bilder/icons/403836.png",
+  "bilder/icons/403837.png",
+  "bilder/icons/403871.png",
+  "bilder/icons/403872.png",
+  "bilder/icons/403873.png",
+  "bilder/icons/403874.png",
+  "bilder/icons/403879.png",
+  "bilder/icons/403880.png",
+  "bilder/icons/403881.png",
+  "bilder/icons/403882.png",
+  "bilder/icons/403883.png",
+  "bilder/icons/403884.png",
+  "bilder/icons/403885.png",
+  "bilder/icons/403886.png",
+  "bilder/icons/403887.png",
+  "bilder/icons/403888.png",
+  "bilder/icons/403891.png",
+  "bilder/icons/403892.png",
+  "bilder/icons/403893.png",
+  "bilder/icons/403894.png",
+  "bilder/icons/404791.png",
+  "bilder/icons/404792.png",
+  "bilder/icons/404795.png",
+  "bilder/icons/404796.png",
+  "bilder/icons/404797.png",
+  "bilder/icons/404799.png",
+];
+
+const ENEMY_IMAGES = ENEMY_IMAGE_PATHS.map(src => {
+  const img = new Image();
+  img.src = src;
+  return img;
+});
 
 let clickHistory = [];
 let overlayElement;
@@ -9,6 +70,7 @@ let closeButton;
 let canvasElement;
 let gameController;
 let lastFocusedElement = null;
+let overlayOpenedAt = 0;
 
 function setup() {
   const logo = document.querySelector("#logo-container img");
@@ -24,7 +86,10 @@ function setup() {
   closeButton?.addEventListener("click", closeOverlay);
   overlayElement.addEventListener("click", event => {
     if (event.target === overlayElement) {
-      closeOverlay();
+      const now = performance.now();
+      if (now - overlayOpenedAt >= OVERLAY_CLOSE_DELAY) {
+        closeOverlay();
+      }
     }
   });
 
@@ -85,7 +150,7 @@ function createOverlay() {
 
   const instructions = document.createElement("p");
   instructions.className = "diagnostics-overlay__instructions";
-  instructions.textContent = "Steuerung: ← → bewegen, Leertaste feuert. Enter startet neu.";
+  instructions.textContent = "Steuerung: ← → bewegen, Leertaste halten für Dauerfeuer, Enter startet neu.";
 
   body.append(canvas, instructions);
   header.append(title, close);
@@ -103,6 +168,7 @@ function openOverlay() {
   overlayElement.classList.add("is-open");
   overlayElement.setAttribute("aria-hidden", "false");
   document.body.classList.add("overlay-open");
+  overlayOpenedAt = performance.now();
 
   if (!gameController) {
     gameController = createDiagnosticsController(canvasElement);
@@ -130,6 +196,7 @@ function closeOverlay() {
     lastFocusedElement.focus();
   }
   lastFocusedElement = null;
+  overlayOpenedAt = 0;
 }
 
 function createDiagnosticsController(canvas) {
@@ -137,12 +204,12 @@ function createDiagnosticsController(canvas) {
   const width = canvas.width;
   const height = canvas.height;
 
-  const stars = Array.from({ length: 40 }, () => ({
-    x: Math.random() * width,
-    y: Math.random() * height,
-    size: Math.random() * 2 + 0.5,
-    speed: 20 + Math.random() * 30,
-  }));
+  const starLayers = [
+    createStarLayer(26, 18, 30, "rgba(59, 130, 246, 0.2)"),
+    createStarLayer(32, 28, 40, "rgba(248, 250, 252, 0.9)"),
+    createStarLayer(18, 42, 60, "rgba(125, 211, 252, 0.6)"),
+  ];
+  const totalEnemies = ENEMY_IMAGES.length;
 
   const player = {
     x: width / 2,
@@ -150,16 +217,15 @@ function createDiagnosticsController(canvas) {
     width: 46,
     height: 18,
     speed: 320,
-    cooldown: 0,
   };
 
   const bullets = [];
   const enemies = [];
   const keys = new Set();
-
-  const enemyGrid = { rows: 4, cols: 8 };
-  let enemyDirection = 1;
-  let enemySpeed = 60;
+  const enemyOrder = [];
+  let defeatedCount = 0;
+  let spawnTimer = 0;
+  let nextEnemyIndex = 0;
   let lastTime = 0;
   let frame;
   let running = false;
@@ -192,31 +258,17 @@ function createDiagnosticsController(canvas) {
 
   function resetGame() {
     player.x = width / 2;
-    player.cooldown = 0;
     bullets.length = 0;
     enemies.length = 0;
-    enemyDirection = 1;
-    enemySpeed = 60;
     status = "playing";
     message = "";
     messageAlpha = 0;
     keys.clear();
-
-    const offsetX = 70;
-    const offsetY = 70;
-    const spacingX = 60;
-    const spacingY = 40;
-    for (let row = 0; row < enemyGrid.rows; row += 1) {
-      for (let col = 0; col < enemyGrid.cols; col += 1) {
-        enemies.push({
-          x: offsetX + col * spacingX,
-          y: offsetY + row * spacingY,
-          width: 32,
-          height: 24,
-          alive: true,
-        });
-      }
-    }
+    enemyOrder.length = 0;
+    enemyOrder.push(...shuffleArray(ENEMY_IMAGES));
+    defeatedCount = 0;
+    spawnTimer = 0;
+    nextEnemyIndex = 0;
   }
 
   function start() {
@@ -265,16 +317,14 @@ function createDiagnosticsController(canvas) {
       }
       player.x = Math.max(player.width / 2 + 10, Math.min(width - player.width / 2 - 10, player.x));
 
-      player.cooldown -= delta;
-      if (keys.has("Space") && player.cooldown <= 0) {
+      if (keys.has("Space")) {
         bullets.push({
           x: player.x,
           y: player.y - player.height / 2,
           width: 4,
           height: 12,
-          speed: 520,
+          speed: 540,
         });
-        player.cooldown = 0.3;
       }
 
       bullets.forEach(bullet => {
@@ -286,56 +336,64 @@ function createDiagnosticsController(canvas) {
         }
       }
 
-      let stepDown = false;
-      const aliveEnemies = enemies.filter(enemy => enemy.alive);
-      const speedBoost = Math.max(0, (enemyGrid.rows * enemyGrid.cols - aliveEnemies.length) * 2);
-      enemySpeed = 60 + speedBoost;
-
-      aliveEnemies.forEach(enemy => {
-        enemy.x += enemyDirection * enemySpeed * delta;
-        if (enemy.x <= 30 || enemy.x + enemy.width >= width - 30) {
-          stepDown = true;
+      for (let i = enemies.length - 1; i >= 0; i -= 1) {
+        const enemy = enemies[i];
+        if (!enemy.alive) {
+          enemies.splice(i, 1);
+          continue;
         }
-      });
-
-      if (stepDown) {
-        enemyDirection *= -1;
-        aliveEnemies.forEach(enemy => {
-          enemy.y += 24;
-        });
+        updateEnemy(enemy, delta);
       }
 
       for (let b = bullets.length - 1; b >= 0; b -= 1) {
         const bullet = bullets[b];
+        let hit = false;
         for (let i = 0; i < enemies.length; i += 1) {
           const enemy = enemies[i];
-          if (!enemy.alive) continue;
-          if (
-            bullet.x >= enemy.x &&
-            bullet.x <= enemy.x + enemy.width &&
-            bullet.y <= enemy.y + enemy.height &&
-            bullet.y + bullet.height >= enemy.y
-          ) {
+          if (isBulletColliding(bullet, enemy)) {
             enemy.alive = false;
-            bullets.splice(b, 1);
+            defeatedCount += 1;
+            hit = true;
             break;
           }
         }
+        if (hit) {
+          bullets.splice(b, 1);
+        }
       }
 
-      if (aliveEnemies.length === 0) {
-        status = "won";
-        message = "System stabilisiert – Enter für neue Messung";
-        messageAlpha = 0;
-      }
-
-      aliveEnemies.forEach(enemy => {
-        if (enemy.y + enemy.height >= player.y - 10) {
+      for (let i = enemies.length - 1; i >= 0; i -= 1) {
+        const enemy = enemies[i];
+        if (!enemy.alive) {
+          enemies.splice(i, 1);
+          continue;
+        }
+        if (enemy.y - enemy.height / 2 > height) {
           status = "lost";
           message = "Anomalie erkannt – Enter für neuen Scan";
           messageAlpha = 0;
         }
-      });
+      }
+
+      if (status === "playing") {
+        spawnTimer -= delta;
+        if (spawnTimer <= 0 && nextEnemyIndex < enemyOrder.length && enemies.length === 0) {
+          const nextEnemyImage = enemyOrder[nextEnemyIndex];
+          if (!nextEnemyImage.complete) {
+            spawnTimer = 0.3;
+          } else {
+            enemies.push(createEnemy(nextEnemyImage, nextEnemyIndex));
+            nextEnemyIndex += 1;
+            spawnTimer = 0.6 + Math.random() * 0.5;
+          }
+        }
+
+        if (nextEnemyIndex >= enemyOrder.length && enemies.length === 0) {
+          status = "won";
+          message = "System stabilisiert – Enter für neue Messung";
+          messageAlpha = 0;
+        }
+      }
     }
 
     if (message) {
@@ -344,13 +402,16 @@ function createDiagnosticsController(canvas) {
       messageAlpha = 0;
     }
 
-    stars.forEach(star => {
-      star.y += star.speed * delta * (status === "playing" ? 1 : 0.5);
-      if (star.y > height) {
-        star.y = -star.size;
-        star.x = Math.random() * width;
-        star.speed = 20 + Math.random() * 30;
-      }
+    starLayers.forEach(layer => {
+      layer.stars.forEach(star => {
+        star.y += star.speed * delta * (status === "playing" ? layer.parallax : layer.parallax * 0.6);
+        star.x += Math.sin((star.y + star.speed) * star.driftFrequency) * star.driftStrength;
+        star.twinklePhase += delta * star.twinkleSpeed;
+        if (star.y > height) {
+          star.y = -star.radius;
+          star.x = Math.random() * width;
+        }
+      });
     });
   }
 
@@ -363,12 +424,23 @@ function createDiagnosticsController(canvas) {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-    stars.forEach(star => {
-      ctx.beginPath();
-      ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-      ctx.fill();
+    starLayers.forEach(layer => {
+      layer.stars.forEach(star => {
+        const twinkle = (Math.sin(star.twinklePhase) + 1) / 2;
+        const alpha = Math.min(1, Math.max(0.2, layer.baseAlpha + twinkle * 0.4));
+        ctx.fillStyle = layer.color.replace("ALPHA", alpha.toFixed(3));
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
     });
+
+    ctx.save();
+    ctx.fillStyle = "rgba(226, 232, 240, 0.82)";
+    ctx.font = "14px 'Segoe UI', sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText(`Analysefortschritt: ${Math.min(defeatedCount, totalEnemies)} / ${totalEnemies}`, 20, 26);
+    ctx.restore();
 
     ctx.fillStyle = "#7dd3fc";
     ctx.beginPath();
@@ -383,15 +455,17 @@ function createDiagnosticsController(canvas) {
       ctx.fillRect(bullet.x - bullet.width / 2, bullet.y - bullet.height, bullet.width, bullet.height);
     });
 
-    ctx.fillStyle = "#facc15";
     enemies.forEach(enemy => {
       if (!enemy.alive) return;
-      ctx.beginPath();
-      ctx.rect(enemy.x, enemy.y, enemy.width, enemy.height);
-      ctx.fill();
-      ctx.fillStyle = "#fde68a";
-      ctx.fillRect(enemy.x + 6, enemy.y + 6, enemy.width - 12, enemy.height - 12);
-      ctx.fillStyle = "#facc15";
+      if (!enemy.image.complete) return;
+      ctx.save();
+      ctx.translate(enemy.x, enemy.y);
+      ctx.rotate(enemy.rotation);
+      const drawWidth = enemy.image.naturalWidth * enemy.scale;
+      const drawHeight = enemy.image.naturalHeight * enemy.scale;
+      ctx.globalAlpha = Math.min(1, enemy.progress / 0.6);
+      ctx.drawImage(enemy.image, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+      ctx.restore();
     });
 
     if (status === "won" || status === "lost") {
@@ -424,6 +498,120 @@ function createDiagnosticsController(canvas) {
       default:
         return null;
     }
+  }
+
+  function createStarLayer(count, baseSpeed, speedVariance, color) {
+    const match = color.match(/rgba?\(([^,]+,[^,]+,[^,]+)(?:,([^\)]+))?\)/);
+    const channels = match ? match[1] : "248, 250, 252";
+    const alpha = match && match[2] !== undefined ? parseFloat(match[2]) : 0.35;
+    const baseAlpha = Math.min(0.85, Math.max(0.12, Number.isFinite(alpha) ? alpha : 0.35));
+    return {
+      color: `rgba(${channels}, ALPHA)`,
+      baseAlpha,
+      parallax: 0.7 + Math.random() * 0.4,
+      stars: Array.from({ length: count }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 2 + 0.4,
+        speed: baseSpeed + Math.random() * speedVariance,
+        driftFrequency: 0.002 + Math.random() * 0.004,
+        driftStrength: Math.random() * 12,
+        twinklePhase: Math.random() * Math.PI * 2,
+        twinkleSpeed: 0.6 + Math.random() * 1.2,
+      })),
+    };
+  }
+
+  function createEnemy(image, index) {
+    const scale = 0.4 + Math.random() * 0.25;
+    const baseWidth = (image.naturalWidth || 96) * scale;
+    const baseHeight = (image.naturalHeight || 96) * scale;
+    const baseX = width * (0.2 + Math.random() * 0.6);
+    const baseY = -baseHeight - Math.random() * 120;
+    const pathType = index % 3;
+    const enemy = {
+      image,
+      x: baseX,
+      y: baseY,
+      baseX,
+      baseY,
+      width: baseWidth,
+      height: baseHeight,
+      scale,
+      alive: true,
+      progress: 0,
+      scrollSpeed: 70 + Math.random() * 50,
+      amplitude: 40 + Math.random() * 60,
+      waveFrequency: 0.9 + Math.random() * 0.5,
+      waveOffset: Math.random() * Math.PI * 2,
+      rotation: 0,
+      pathType,
+    };
+
+    if (!image.complete) {
+      image.addEventListener(
+        "load",
+        () => {
+          enemy.width = (image.naturalWidth || 96) * enemy.scale;
+          enemy.height = (image.naturalHeight || 96) * enemy.scale;
+        },
+        { once: true },
+      );
+    }
+
+    return enemy;
+  }
+
+  function updateEnemy(enemy, delta) {
+    enemy.progress += delta;
+    const t = enemy.progress;
+    const baseY = enemy.baseY + enemy.scrollSpeed * t * 1.1;
+
+    switch (enemy.pathType) {
+      case 0: {
+        const horizontal = Math.sin(t * enemy.waveFrequency + enemy.waveOffset) * enemy.amplitude;
+        const vertical = Math.cos(t * (enemy.waveFrequency * 0.6) + enemy.waveOffset) * 12;
+        enemy.x = enemy.baseX + horizontal;
+        enemy.y = baseY + vertical;
+        break;
+      }
+      case 1: {
+        const orbitRadius = enemy.amplitude + 50;
+        enemy.x = width / 2 + Math.sin(t * (enemy.waveFrequency + 0.6) + enemy.waveOffset) * orbitRadius;
+        enemy.y = baseY + Math.cos(t * (enemy.waveFrequency + 0.4) + enemy.waveOffset) * 24;
+        break;
+      }
+      default: {
+        const horizontal = Math.sin(t * (enemy.waveFrequency * 2.4) + enemy.waveOffset) * (enemy.amplitude + 80);
+        const vertical = Math.sin(t * (enemy.waveFrequency * 1.7) + enemy.waveOffset * 1.3) * 18;
+        enemy.x = enemy.baseX + horizontal;
+        enemy.y = baseY + vertical;
+        break;
+      }
+    }
+
+    enemy.x = Math.max(enemy.width / 2 + 16, Math.min(width - enemy.width / 2 - 16, enemy.x));
+    enemy.rotation = Math.sin(t * 1.8 + enemy.waveOffset) * 0.35;
+  }
+
+  function isBulletColliding(bullet, enemy) {
+    const halfWidth = enemy.width / 2;
+    const halfHeight = enemy.height / 2;
+    return (
+      bullet.x >= enemy.x - halfWidth &&
+      bullet.x <= enemy.x + halfWidth &&
+      bullet.y <= enemy.y + halfHeight &&
+      bullet.y + bullet.height >= enemy.y - halfHeight
+    );
+  }
+
+  function shuffleArray(items) {
+    const copy = items.slice();
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
   }
 }
 
