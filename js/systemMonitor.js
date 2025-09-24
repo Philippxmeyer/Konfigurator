@@ -109,8 +109,8 @@ function createOverlay() {
   body.className = "article-overlay__body diagnostics-overlay__body";
 
   const canvas = document.createElement("canvas");
-  canvas.width = 640;
-  canvas.height = 480;
+  canvas.width = 480;
+  canvas.height = 640;
   canvas.className = "diagnostics-overlay__canvas";
   canvas.setAttribute("role", "img");
   canvas.setAttribute("aria-label", "Visualisierung des Systemmonitors");
