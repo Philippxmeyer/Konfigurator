@@ -135,6 +135,8 @@ button {
   backdrop-filter: blur(6px);
   box-shadow: -18px 0 36px -30px rgba(15, 23, 42, 0.35);
   min-height: 0;
+  max-height: 100vh;
+  overflow-y: auto;
 }
 
 .sidebar-actions {
@@ -144,6 +146,7 @@ button {
   position: sticky;
   top: 20px;
   z-index: 10;
+  margin-bottom: 10px;
 }
 
 #articleListTrigger {
@@ -179,7 +182,6 @@ button {
 .sidebar {
   flex: 1;
   padding: 2px 0px;
-  overflow-y: auto;
   min-height: 0;
   /* background: #ffffff; */
   /* border: 1px solid black; */
@@ -914,6 +916,8 @@ select:focus-visible {
     backdrop-filter: blur(8px);
     gap: 16px;
     flex: none;
+    max-height: none;
+    overflow: visible;
   }
 
   .sidebar-actions {
