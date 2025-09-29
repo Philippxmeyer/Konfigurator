@@ -620,11 +620,12 @@ select:focus-visible {
 }
 
 .diagnostics-overlay__canvas {
-  width: min(100%, 680px);
+  width: min(100%, 480px);
   height: auto;
   background: radial-gradient(circle at 30% 20%, rgba(148, 163, 184, 0.25), transparent 55%), #020617;
   border: 1px solid rgba(148, 163, 184, 0.35);
   box-shadow: 0 28px 44px -30px rgba(15, 23, 42, 0.7);
+  touch-action: none;
 }
 
 .diagnostics-overlay__instructions {
