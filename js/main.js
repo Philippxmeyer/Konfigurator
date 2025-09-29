@@ -5,7 +5,7 @@ import { decodeConfig } from "./share.js";
 import { updatePreview } from "./preview.js";
 import { loadArticles } from "./articleLoader.js";
 import { initPreviewZoom } from "./zoom.js";
-import "./systemMonitor.js";
+//import "./systemMonitor.js";
 
 let configXML;
 const images = {};
