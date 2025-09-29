@@ -9,6 +9,89 @@ import { initPreviewZoom } from "./zoom.js";
 
 let configXML;
 const images = {};
+let lastKnownValues = {};
+
+function getSidebarSelects() {
+  return document.querySelectorAll(".sidebar select");
+}
+
+function collectSidebarValues() {
+  const values = {};
+  getSidebarSelects().forEach(sel => {
+    values[sel.id] = sel.value;
+  });
+  return values;
+}
+
+function updatePreviousValueDatasets() {
+  getSidebarSelects().forEach(sel => {
+    sel.dataset.previousValue = sel.value;
+  });
+}
+
+function getOptionText(select, value) {
+  if (!select) return value;
+  const option = Array.from(select.options).find(opt => opt.value === value);
+  return option ? option.textContent.trim() : value;
+}
+
+function applySidebarValues(values) {
+  Object.entries(values).forEach(([id, value]) => {
+    const select = document.getElementById(id);
+    if (select) {
+      select.value = value;
+    }
+  });
+}
+
+function handleSidebarChange({ id, previousValue }) {
+  if (!configXML) return;
+
+  const beforeValues = { ...lastKnownValues };
+  updatePreview(configXML, images);
+
+  const newValues = collectSidebarValues();
+
+  const hadValuesBefore = Object.keys(beforeValues).length > 0;
+  if (hadValuesBefore) {
+    const adjustments = Object.keys(newValues)
+      .filter(key => key !== id && beforeValues[key] !== undefined && beforeValues[key] !== newValues[key])
+      .map(key => ({
+        id: key,
+        oldValue: beforeValues[key],
+        newValue: newValues[key]
+      }));
+
+    if (adjustments.length > 0) {
+      const adjustmentText = adjustments.map(({ id: fieldId, oldValue, newValue }) => {
+        const select = document.getElementById(fieldId);
+        const label = select?.dataset.label || fieldId;
+        const oldLabel = getOptionText(select, oldValue);
+        const newLabel = getOptionText(select, newValue);
+        return `- ${label}: ${oldLabel} → ${newLabel}`;
+      }).join("\n");
+
+      const message = `Warnung: Die aktuelle Änderung führt zu einer ungültigen Konfiguration.\n` +
+        `Daher würden folgende Werte angepasst:\n\n${adjustmentText}\n\n` +
+        "Möchten Sie die Änderung trotzdem übernehmen?";
+
+      if (!window.confirm(message)) {
+        applySidebarValues(beforeValues);
+        const select = document.getElementById(id);
+        if (select) {
+          select.value = previousValue;
+        }
+        updatePreview(configXML, images);
+        lastKnownValues = collectSidebarValues();
+        updatePreviousValueDatasets();
+        return;
+      }
+    }
+  }
+
+  lastKnownValues = newValues;
+  updatePreviousValueDatasets();
+}
 function setupOverlay(triggerId, overlayId) {
   const overlay = document.getElementById(overlayId);
   const trigger = document.getElementById(triggerId);
@@ -96,7 +179,7 @@ async function init() {
 
   // 2) Sidebar bauen (setzt Defaults aus config.xml)
   const sidebarEl = document.getElementById("sidebar");
-  buildSidebar(configXML, sidebarEl, () => updatePreview(configXML, images));
+  buildSidebar(configXML, sidebarEl, handleSidebarChange);
 
   // 3) Layer-Images vorbereiten – in #stage einhängen (Fallback: #preview)
   const stage = document.getElementById("stage") || document.getElementById("preview");
@@ -117,6 +200,8 @@ async function init() {
 
   // 6) Erste Darstellung
   updatePreview(configXML, images);
+  lastKnownValues = collectSidebarValues();
+  updatePreviousValueDatasets();
 }
 
 init();
