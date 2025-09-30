@@ -233,6 +233,8 @@ export function buildSidebar(configXML, container, onChange) {
 
         const sel = document.createElement("select");
         sel.id = id;
+        sel.dataset.label = label;
+        sel.dataset.sectionTitle = secHeader.textContent;
 
         configXML.querySelectorAll(`options > ${optGroup} > wert`).forEach(optNode => {
           const opt = document.createElement("option");
@@ -244,16 +246,22 @@ export function buildSidebar(configXML, container, onChange) {
           sel.appendChild(opt);
         });
 
+        sel.dataset.previousValue = sel.value;
+
         const isSliderField = sliderFieldIds.has(id);
 
         const handleChange = () => {
+          const previousValue = sel.dataset.previousValue ?? sel.value;
           if (isSliderField) {
             const control = sliderControls.get(id);
             if (control) {
               updateSliderControl(control);
             }
           }
-          onChange();
+          if (typeof onChange === "function") {
+            onChange({ id, select: sel, previousValue });
+          }
+          sel.dataset.previousValue = sel.value;
         };
 
         sel.addEventListener("change", handleChange);
