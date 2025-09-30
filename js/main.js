@@ -10,6 +10,7 @@ import { initPreviewZoom } from "./zoom.js";
 let configXML;
 const images = {};
 let lastKnownValues = {};
+const sectionHighlightTimeouts = new WeakMap();
 
 function getSidebarSelects() {
   return document.querySelectorAll(".sidebar select");
@@ -21,6 +22,99 @@ function collectSidebarValues() {
     values[sel.id] = sel.value;
   });
   return values;
+}
+
+function ensureSectionIsVisible(section) {
+  if (!section) return;
+  const group = section.closest(".group");
+  if (group) {
+    group.classList.remove("collapsed");
+  }
+  section.classList.remove("collapsed");
+}
+
+function highlightSection(sectionId) {
+  if (!sectionId) return;
+  const section = document.querySelector(`.section[data-section-id="${sectionId}"]`);
+  if (!section) return;
+
+  ensureSectionIsVisible(section);
+
+  if (sectionHighlightTimeouts.has(section)) {
+    clearTimeout(sectionHighlightTimeouts.get(section));
+  }
+
+  section.classList.remove("section--highlight");
+  // Force reflow so that re-adding the class restarts the animation.
+  void section.offsetWidth;
+  section.classList.add("section--highlight");
+
+  const timeoutId = window.setTimeout(() => {
+    section.classList.remove("section--highlight");
+    sectionHighlightTimeouts.delete(section);
+  }, 1200);
+
+  sectionHighlightTimeouts.set(section, timeoutId);
+}
+
+function getSectionIdForLayer(layerId) {
+  if (!layerId) return null;
+  if (layerId === "grundtisch") return "grundtisch";
+  if (layerId.startsWith("seiten")) return "seitenblenden";
+  if (layerId === "saeulen") return "aufbau";
+  if (layerId.startsWith("platte")) return "platten";
+  if (layerId.startsWith("boden")) return "boeden";
+  if (layerId.startsWith("laufschiene")) return "laufschienen";
+  if (layerId.startsWith("container")) return "container";
+  if (layerId === "ablagebord") return "ablagebord";
+  return null;
+}
+
+function resolveHighlightTarget(event) {
+  if (!(event instanceof Event)) return null;
+
+  const directTarget = event.target instanceof HTMLElement
+    ? event.target.closest("[data-highlight-section]")
+    : null;
+  if (directTarget) {
+    return directTarget;
+  }
+
+  const hasCoordinates = "clientX" in event && typeof event.clientX === "number"
+    && "clientY" in event && typeof event.clientY === "number";
+  if (!hasCoordinates) {
+    return null;
+  }
+
+  const inputLayer = document.getElementById("inputLayer");
+  if (!inputLayer) {
+    return null;
+  }
+
+  const previousPointerEvents = inputLayer.style.pointerEvents;
+  inputLayer.style.pointerEvents = "none";
+  const elementBelow = document.elementFromPoint(event.clientX, event.clientY);
+  inputLayer.style.pointerEvents = previousPointerEvents;
+  if (elementBelow instanceof HTMLElement) {
+    return elementBelow.closest("[data-highlight-section]");
+  }
+
+  return null;
+}
+
+function handleHighlightTrigger(event) {
+  if (event.type === "pointerup" && typeof PointerEvent !== "undefined"
+    && event instanceof PointerEvent && event.pointerType === "mouse") {
+    return;
+  }
+
+  const highlightTarget = resolveHighlightTarget(event);
+  if (!highlightTarget) return;
+
+  const sectionId = highlightTarget.dataset.highlightSection;
+  if (sectionId) {
+    highlightSection(sectionId);
+  }
 }
 
 function updatePreviousValueDatasets() {
@@ -125,6 +219,13 @@ function handleSidebarChange({ id, previousValue }) {
   lastKnownValues = newValues;
   updatePreviousValueDatasets();
 }
+
+[
+  "click",
+  "pointerup"
+].forEach(eventName => {
+  document.addEventListener(eventName, handleHighlightTrigger);
+});
 function setupOverlay(triggerId, overlayId) {
   const overlay = document.getElementById(overlayId);
   const trigger = document.getElementById(triggerId);
@@ -219,6 +320,11 @@ async function init() {
   configXML.querySelectorAll("layers > layer").forEach(layerNode => {
     const id = layerNode.getAttribute("id");
     const img = document.createElement("img");
+    img.dataset.layerId = id ?? "";
+    const sectionId = getSectionIdForLayer(id ?? "");
+    if (sectionId) {
+      img.dataset.highlightSection = sectionId;
+    }
     stage.appendChild(img);
     images[id] = img;
   });
