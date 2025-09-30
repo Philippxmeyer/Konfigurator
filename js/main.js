@@ -28,6 +28,14 @@ function ensureSectionIsVisible(section) {
   if (!section) return;
   const group = section.closest(".group");
   if (group) {
+    const container = group.parentElement;
+    if (container) {
+      container.querySelectorAll(".group").forEach(otherGroup => {
+        if (otherGroup !== group) {
+          otherGroup.classList.add("collapsed");
+        }
+      });
+    }
     group.classList.remove("collapsed");
   }
   section.classList.remove("collapsed");
