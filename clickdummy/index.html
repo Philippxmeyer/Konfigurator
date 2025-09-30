@@ -69,7 +69,7 @@
       margin-left: 10px;
     }
 
-    /* Zwei Boxen nebeneinander */
+    /* Layout-Reihen */
     .row {
       display: flex;
       justify-content: center;
@@ -94,16 +94,38 @@
       background: transparent;
       border: 2px solid #000;
     }
+
+    /* Produkt-Kacheln */
     .box.center {
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between; /* schiebt Button nach unten */
+    }
+    .box.center h1 {
+      margin: 0 0 10px;
+    }
+    .box.center img {
+      max-height: 500px;
+      max-width: 450px;
+      margin: 20px auto;
+    }
+    .product-content {
+      flex: 1 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .product-button {
+      margin-top: auto;
     }
 
-    /* Gelbe Buttons einheitlich */
+    /* Gelbe Buttons */
     .yellowButton {
       display: inline-block;
       background: #fadd0e;
       border: 1px solid #fadd0e;
-      padding: 12px 24px;
+      padding: 20px 40px;
       font-weight: 600;
       text-decoration: none;
       color: #000;
@@ -114,10 +136,6 @@
     .yellowButton:hover {
       background: #ffe94d;
       border-color: #ffe94d;
-    }
-
-    .box.center img {
-      margin: 20px 0;
     }
   </style>
 </head>
@@ -142,7 +160,7 @@
 
   <div class="row">
     <div class="box left">
-      <h3>Warum dieser Konfigurator?</h3>
+      <h3>Ihre Vorteile:</h3>
       <ul>
         <li>Schnell, übersichtlich und passgenau planen</li>
         <li>Platten, Gestelle und Zubehör direkt kombinieren</li>
@@ -163,19 +181,23 @@
 
   <div class="row">
     <div class="box center">
-      <h1>Arbeitstisch AST31</h1>
-      <a target="_blank" href="https://philippxmeyer.github.io/Konfigurator/?config=IwVgDGA%2BCGDOAuBmYkDuBTAlrW0A2ArgLaYB2mxaWOkA9gBanqQDm6C6eedjzUUbDlx5NIUBkyA">
-        <img src="bilder/ast31.webp" style="width:450px" alt="AST31">
-        <div><span class="yellowButton">Jetzt konfigurieren</span></div>
-      </a>
+      <div class="product-content">
+        <h1>Arbeitstisch AST31</h1>
+        <a target="_blank" href="https://philippxmeyer.github.io/Konfigurator/?config=IwVgDGA%2BCGDOAuBmYkDuBTAlrW0A2ArgLaYB2mxaWOkA9gBanqQDm6C6eedjzUUbDlx5NIUBkyA">
+          <img src="bilder/ast31.webp" alt="AST31">
+          <div class="product-button"><span class="yellowButton">Jetzt konfigurieren</span></div>
+        </a>
+      </div>
     </div>
   
     <div class="box center">
-      <h1>Arbeitstisch AST31-EL</h1>
-      <a target="_blank" href="https://philippxmeyer.github.io/Konfigurator/?config=IwVgDGA%2BCGDOAuBmYBaApgG0gdzQS1lmgwFcBbPAOz3J30MgHsALStSAczQUyxbchQoXHhj6t2UfmiA">
-        <img src="bilder/ast31-el.webp" style="width:450px" alt="AST31-EL">
-        <div><span class="yellowButton">Jetzt konfigurieren</span></div>
-      </a>
+      <div class="product-content">
+        <h1>Arbeitstisch AST31-EL</h1>
+        <a target="_blank" href="https://philippxmeyer.github.io/Konfigurator/?config=IwVgDGA%2BCGDOAuBmYBaApgG0gdzQS1lmgwFcBbPAOz3J30MgHsALStSAczQUyxbchQoXHhj6t2UfmiA">
+          <img src="bilder/ast31-el.webp" alt="AST31-EL">
+          <div class="product-button"><span class="yellowButton">Jetzt konfigurieren</span></div>
+        </a>
+      </div>
     </div>
   </div>
 
@@ -185,25 +207,29 @@
 
   <div class="row">
     <div class="box center">
-      <h1>Arbeitstisch AST31</h1>
-      <a target="_blank" href="https://philippxmeyer.github.io/Konfigurator/?config=IwVgDGA%2BCGDOAuBmYkDuBTAlrW0A2ArgLaYB2mxaWOkeZA1rALQBO6AxgBbywynycW0AF6Z4kTgHsukAEyQUAc3QJ0ePJEmdS6OZu3ogA">
-        <img src="bilder/AST_hoch.png" style="width:450px" alt="AST31 hoch">
-        <div><span class="yellowButton">Jetzt konfigurieren</span></div>
-      </a>
+      <div class="product-content">
+        <h1>Arbeitstisch AST31</h1>
+        <a target="_blank" href="https://philippxmeyer.github.io/Konfigurator/?config=IwVgDGA%2BCGDOAuBmYkDuBTAlrW0A2ArgLaYB2mxaWOkeZA1rALQBO6AxgBbywynycW0AF6Z4kTgHsukAEyQUAc3QJ0ePJEmdS6OZu3ogA">
+          <img src="bilder/AST_hoch.png" alt="AST31 hoch">
+          <div class="product-button"><span class="yellowButton">Jetzt konfigurieren</span></div>
+        </a>
+      </div>
     </div>
   
     <div class="box center">
-      <h1>Arbeitstisch AST31-EL</h1>
-      <a target="_blank" href="https://philippxmeyer.github.io/Konfigurator/?config=IwVgDGA%2BCGDOAuBmYBaApgG0gdzQS1lmgwFcBbPAOz3MgCMSBjACzUgHtnK2BzNBTFmpoAJgCc8PSFABMkPgIxZO3aRy5ogA">
-        <img src="bilder/AST-EL_niedrig.png" style="width:450px" alt="AST31-EL niedrig">
-        <div><span class="yellowButton">Jetzt konfigurieren</span></div>
-      </a>
+      <div class="product-content">
+        <h1>Arbeitstisch AST31-EL</h1>
+        <a target="_blank" href="https://philippxmeyer.github.io/Konfigurator/?config=IwVgDGA%2BCGDOAuBmYBaApgG0gdzQS1lmgwFcBbPAOz3MgCMSBjACzUgHtnK2BzNBTFmpoAJgCc8PSFABMkPgIxZO3aRy5ogA">
+          <img src="bilder/AST-EL_niedrig.png" alt="AST31-EL niedrig">
+          <div class="product-button"><span class="yellowButton">Jetzt konfigurieren</span></div>
+        </a>
+      </div>
     </div>
   </div>
 
   <div class="row" style="flex-direction: column; text-align:center;">
-    <h1>Zubehör finden Sie hier:</h1>
-    <img src="bilder/ast-zubehoer.png" alt="Zubehör" style="max-width:600px; margin:20px auto;">
+    <h1 style="margin:0 auto">Zubehör finden Sie hier:</h1>
+    <img src="bilder/ast-zubehoer.png" alt="Zubehör" style="margin:20px auto; max-width:600px;">
     <div><a href="#" class="yellowButton">Mehr entdecken</a></div>
   </div>
 
