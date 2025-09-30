@@ -61,12 +61,13 @@ button {
   /* border-radius: 999px; */
 }
 
-#submitBtn {
-    background-image: url(bilder/S-punkt-Logo_svg.svg);
-    background-repeat: no-repeat;
-    background-size: 40px auto;
-    background-position: 50px center;
-    box-shadow: 0 12px 24px -18px rgba(252, 211, 0, 0.45);
+#submitBtn,
+#requestBtn {
+  background-image: url(bilder/S-punkt-Logo_svg.svg);
+  background-repeat: no-repeat;
+  background-size: 40px auto;
+  background-position: 50px center;
+  box-shadow: 0 12px 24px -18px rgba(252, 211, 0, 0.45);
 }
 
 #preview { touch-action: none; }
@@ -805,6 +806,12 @@ select:focus-visible {
   letter-spacing: 0.01em;
 }
 
+.article-overlay__share .btn {
+  width: 100%;
+  font-size: 1.05rem;
+  padding: 14px 18px;
+}
+
 .article-overlay__actions {
   background: rgba(248, 250, 255, 0.95);
   border: 1px solid rgba(148, 163, 184, 0.25);
@@ -823,46 +830,6 @@ select:focus-visible {
   width: 100%;
   font-size: 1.05rem;
   padding: 14px 18px;
-}
-
-/* --- Teilen-Link --- */
-.share-container {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  background: #ffffff;
-  /* border-radius: 14px; */
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  padding: 8px 10px;
-  box-shadow: 0 16px 32px -26px rgba(15, 23, 42, 0.45);
-}
-
-#copyBtn {
-  /* background: linear-gradient(135deg, #009fE3, #1d4ed8); */
-  border: none;
-  color: #ffffff;
-  font-size: 1.5em;
-  box-shadow: 0 18px 32px -20px rgba(37, 99, 235, 0.75);
-}
-
-#copyBtn:hover {
-  background: linear-gradient(135deg, #1d4ed8, #1e40af);
-  box-shadow: 0 26px 44px -24px rgba(29, 78, 216, 0.75);
-}
-
-#shareInput {
-  flex: 1;
-  padding: 10px 12px;
-  border: none;
-  /* border-radius: 10px; */
-  font-size: 0.95rem;
-  background: transparent;
-  color: #1f2937;
-}
-
-#shareInput:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
 }
 
 /* --- Logo oben links --- */

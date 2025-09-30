@@ -1,3 +1,5 @@
+import { buildArticleItems } from "./articles.js";
+
 // Reihenfolge der Felder festlegen
 const fieldOrder = [
   "breite",
@@ -14,6 +16,9 @@ const fieldOrder = [
   "laufschienenanzahl",
   "ablagebord"    
 ];
+
+let lastConfigValues = {};
+let lastConfigURL = "";
 
 export function encodeConfig(values) {
   // Werte in fester Reihenfolge einsammeln
@@ -42,43 +47,92 @@ export function updateURL(values) {
   const newURL = `${window.location.pathname}?${params.toString()}`;
   window.history.replaceState({}, "", newURL);
 
+  lastConfigValues = { ...values };
+  lastConfigURL = window.location.origin + newURL;
+
   const shareRoot = document.getElementById("articleOverlayShare");
   if (!shareRoot) return;
 
-  if (!shareRoot.querySelector("#shareInput")) {
-    shareRoot.innerHTML = `
-      <h3>Konfiguration teilen</h3>
-      <div class="share-container">
-        <input type="text" id="shareInput" readonly>
-        <button id="copyBtn" class="btn btn--icon" type="button" title="Kopieren">📋</button>
-      </div>
-    `;
+  let requestBtn = shareRoot.querySelector("#requestBtn");
+  if (!requestBtn) {
+    shareRoot.innerHTML = "";
 
-    const copyBtn = shareRoot.querySelector("#copyBtn");
-    copyBtn.addEventListener("click", async () => {
-      const input = shareRoot.querySelector("#shareInput");
-      input.focus();
-      input.select();
-      input.setSelectionRange(0, input.value.length);
+    const heading = document.createElement("h3");
+    heading.textContent = "Konfiguration anfragen";
+    shareRoot.appendChild(heading);
 
-      try {
-        if (navigator.clipboard?.writeText) {
-          await navigator.clipboard.writeText(input.value);
-        } else {
-          document.execCommand("copy");
-        }
-      } catch (err) {
-        document.execCommand("copy");
-      }
-
-      const oldText = copyBtn.textContent;
-      copyBtn.textContent = "✅";
-      copyBtn.focus();
-      setTimeout(() => {
-        copyBtn.textContent = oldText;
-      }, 1000);
-    });
+    requestBtn = document.createElement("button");
+    requestBtn.id = "requestBtn";
+    requestBtn.type = "button";
+    requestBtn.className = "btn";
+    requestBtn.textContent = "Konfiguration anfragen";
+    shareRoot.appendChild(requestBtn);
   }
 
-  shareRoot.querySelector("#shareInput").value = window.location.origin + newURL;
+  requestBtn.onclick = () => {
+    const items = buildArticleItems(lastConfigValues);
+    const subject = "Konfiguration anfragen";
+    const body = buildEmailBody(items, lastConfigURL);
+    const encodedSubject = encodeURIComponent(subject);
+    const encodedBody = encodeURIComponent(body).replace(/%0A/g, "%0D%0A");
+    const mailto = `mailto:test@123.de?subject=${encodedSubject}&body=${encodedBody}`;
+
+    window.location.href = mailto;
+  };
+}
+
+function buildEmailBody(items, configLink) {
+  const introLines = [
+    "Hallo,",
+    "",
+    "bitte senden Sie mir ein Angebot für folgende Konfiguration:",
+    ""
+  ];
+
+  const table = formatItemsTable(items);
+
+  const outroLines = [
+    "",
+    `Konfigurationslink: ${configLink}`,
+    "",
+    "Vielen Dank!"
+  ];
+
+  return [...introLines, table, ...outroLines].join("\n").trimEnd();
+}
+
+function formatItemsTable(items) {
+  if (!items.length) {
+    return "Keine Artikeldaten verfügbar.";
+  }
+
+  const columns = [
+    {
+      header: "Artikel",
+      getter: item => item.label
+    },
+    {
+      header: "Artikelnummer",
+      getter: item => item.code
+    },
+    {
+      header: "Menge",
+      getter: item => String(item.quantity ?? 1)
+    }
+  ];
+
+  const rows = items.map(item => columns.map(col => col.getter(item)));
+
+  const colWidths = columns.map((col, index) => {
+    const cellLengths = rows.map(row => row[index].length);
+    return Math.max(col.header.length, ...cellLengths);
+  });
+
+  const formatRow = row => row.map((cell, index) => cell.padEnd(colWidths[index])).join(" | ");
+
+  const headerLine = formatRow(columns.map(col => col.header));
+  const separatorLine = colWidths.map(width => "-".repeat(width)).join("-+-");
+  const dataLines = rows.map(formatRow);
+
+  return [headerLine, separatorLine, ...dataLines].join("\n");
 }

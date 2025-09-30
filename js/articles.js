@@ -1,17 +1,6 @@
 import { lookupArticle } from "./articleLoader.js";
 
-/**
- * Baut die Artikelliste auf Basis der aktuellen Auswahl
- */
-export function renderArticleList(values) {
-  const list = document.getElementById("articleItems");
-  if (!list) return;
-  const actionsRoot = document.getElementById("articleOverlayActions");
-  if (actionsRoot) {
-    actionsRoot.innerHTML = "";
-    actionsRoot.hidden = true;
-  }
-  list.innerHTML = "";
+export function buildArticleItems(values) {
   const items = [];
 
   // --- Grundtisch ---
@@ -106,6 +95,23 @@ export function renderArticleList(values) {
       items.push({ label: `Ablagebord (${labelName})`, code: num, quantity: 1 });
     }
   }
+
+  return items;
+}
+
+/**
+ * Baut die Artikelliste auf Basis der aktuellen Auswahl
+ */
+export function renderArticleList(values) {
+  const list = document.getElementById("articleItems");
+  if (!list) return;
+  const actionsRoot = document.getElementById("articleOverlayActions");
+  if (actionsRoot) {
+    actionsRoot.innerHTML = "";
+    actionsRoot.hidden = true;
+  }
+  list.innerHTML = "";
+  const items = buildArticleItems(values);
 
   // --- Rendern (Listenelemente klickbar) ---
   const BASE = "https://www.schaefer-shop.de/product/search?query=";
