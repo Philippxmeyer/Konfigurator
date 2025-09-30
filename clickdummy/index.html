@@ -1,60 +1,140 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AST31-Landingpage</title>
-  <link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&display=swap" rel="stylesheet" />
 
-<style>
-  body {
-    font-family: "Overpass", sans-serif;
-  }
-  #banner {
-    text-align: center;
-  }
-  #banner h2 {
-    font-size: 18px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    font-weight: 400;
-  }
-  #banner h1 {
-    font-size: 48px;
-    font-weight: 800;
-  }
-  #Logo {
-    width: 350px;
-    transform: translate(-20px; 50px);
-  }
-  
-  .blass {
-  width: 400px;
-  height: 300px;
-  background: url("bilder/banner_bg.png") center/cover no-repeat;
-  position: relative;
-}
+  <style>
+    :root {
+      --radius: 12px;
+      --gap: 16px;
+      --gray-100: #f5f5f7;
+      --gray-300: #d0d0d4;
+      --text: #111;
+    }
 
-.blass::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(255,255,255,0.8); /* 0.0 = unsichtbar, 1.0 = komplett weiß */
-}
-</style>
-  
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: "Overpass", sans-serif;
+      line-height: 1.4;
+    }
+
+    #header img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    #banner {
+      text-align: center;
+      padding: 24px 16px 8px;
+    }
+    #banner h2 {
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 400;
+      margin: 12px 0 6px;
+    }
+    #banner h1 {
+      font-size: clamp(32px, 6vw, 48px);
+      font-weight: 800;
+      margin: 6px 0 12px;
+    }
+    #banner p {
+      max-width: 900px;
+      margin: 0 auto 24px;
+    }
+
+    #Logo {
+      width: 350px;
+      vertical-align: middle;
+      transform: translate(-20px, 50px); /* Semikolon -> Komma */
+    }
+
+    /* Sehr blasser Hintergrund-Block */
+    .blass {
+      width: min(100%, 1200px);
+      height: 300px;
+      margin: 16px auto 24px;
+      position: relative;
+      background: url("bilder/banner_bg.png") center/cover no-repeat;
+      border-radius: var(--radius);
+      overflow: hidden; /* wichtig für saubere Rundungen beim Overlay */
+    }
+    .blass::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.88); /* Stell höher, wenn’s noch blasser sein soll */
+      pointer-events: none;
+    }
+
+    /* Zwei nebeneinanderliegende Boxen */
+    .row {
+      display: flex;
+      gap: var(--gap);
+      max-width: 1200px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
+      align-items: stretch;
+    }
+    .box {
+      flex: 1;
+      padding: 16px 20px;
+      border-radius: var(--radius);
+    }
+    .box.left {
+      background: var(--gray-100);
+      /* kein Rahmen */
+    }
+    .box.right {
+      background: transparent;
+      border-bottom: 2px solid var(--gray-300); /* „darunter“ */
+    }
+
+    @media (max-width: 800px) {
+      .row { flex-direction: column; }
+      #Logo { width: 260px; transform: translate(0, 0); }
+      .blass { height: 220px; }
+    }
+  </style>
 </head>
 <body>
   <div id="header">
-    <img src="bilder/shop_header.png">
+    <img src="bilder/shop_header.png" alt="Shop Header">
   </div>
+
   <div id="banner">
     <div class="blass"></div>
+
     <h2>Individuelle Arbeitstische in wenigen Schritten geplant</h2>
-    <h1>Der Konfigurator von <img id="Logo" src="/Konfigurator/bilder/Logo_betriebseinrichtungen_4c.svg"></h1>
-    <p>Den Arbeitsplatz optimal gestalten, um effizient und ergonomisch zu arbeiten:<br>
-Mit dem Konfigurator von Schäfer Betriebseinrichtungen entwerfen Sie ihren Wunscharbeitstisch genau so, wie er zu Ihnen passt – unkompliziert und präzise.</p>
+
+    <h1>
+      Der Konfigurator von
+      <img id="Logo" src="/Konfigurator/bilder/Logo_betriebseinrichtungen_4c.svg" alt="Schäfer Betriebseinrichtungen">
+    </h1>
+
+    <p>
+      Den Arbeitsplatz optimal gestalten, um effizient und ergonomisch zu arbeiten:<br>
+      Mit dem Konfigurator von Schäfer Betriebseinrichtungen entwerfen Sie Ihren Wunscharbeitstisch genau so, wie er zu Ihnen passt – unkompliziert und präzise.
+    </p>
   </div>
-  
-</body>  
+
+  <div class="row">
+    <div class="box left">
+      <h3 style="margin-top:0">Warum dieser Konfigurator?</h3>
+      <p>Planen Sie schnell, übersichtlich und passgenau – inklusive Platten, Gestellen und Zubehör.</p>
+    </div>
+
+    <div class="box right">
+      <h3 style="margin-top:0">Direkt starten</h3>
+      <p>Öffnen, konfigurieren, exportieren. Ihre Auswahl bleibt transparent – Preise &amp; Codes stets im Blick.</p>
+    </div>
+  </div>
+</body>
 </html>
