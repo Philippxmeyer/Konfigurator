@@ -12,7 +12,6 @@
   }
   #banner {
     text-align: center;
-    background-image: url("bilder/banner_bg.png");
   }
   #banner h2 {
     font-size: 18px;
@@ -28,6 +27,20 @@
     width: 350px;
     transform: translate(-20px; 50px);
   }
+  
+  .blass {
+  width: 400px;
+  height: 300px;
+  background: url("bilder/banner_bg.png") center/cover no-repeat;
+  position: relative;
+}
+
+.blass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.8); /* 0.0 = unsichtbar, 1.0 = komplett weiß */
+}
 </style>
   
 </head>
@@ -36,8 +49,9 @@
     <img src="bilder/shop_header.png">
   </div>
   <div id="banner">
+    <div class="blass"></div>
     <h2>Individuelle Arbeitstische in wenigen Schritten geplant</h2>
-    <h1>Der Konfigurator von <img id="Logo" src="/bilder/Logo_betriebseinrichtungen_4c.svg"></h1>
+    <h1>Der Konfigurator von <img id="Logo" src="/Konfigurator/bilder/Logo_betriebseinrichtungen_4c.svg"></h1>
     <p>Den Arbeitsplatz optimal gestalten, um effizient und ergonomisch zu arbeiten:<br>
 Mit dem Konfigurator von Schäfer Betriebseinrichtungen entwerfen Sie ihren Wunscharbeitstisch genau so, wie er zu Ihnen passt – unkompliziert und präzise.</p>
   </div>
