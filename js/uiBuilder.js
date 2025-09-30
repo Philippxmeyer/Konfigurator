@@ -186,6 +186,7 @@ export function buildSidebar(configXML, container, onChange) {
   configXML.querySelectorAll("groups > group").forEach(groupNode => {
     const group = document.createElement("div");
     group.className = "group";
+    group.dataset.groupId = groupNode.getAttribute("id") ?? "";
 
     const groupHeader = document.createElement("h1");
     groupHeader.textContent = groupNode.getAttribute("title");
@@ -209,6 +210,7 @@ export function buildSidebar(configXML, container, onChange) {
     groupNode.querySelectorAll("section").forEach(secNode => {
       const sec = document.createElement("div");
       sec.className = "section";
+      sec.dataset.sectionId = secNode.getAttribute("id") ?? "";
 
       const secHeader = document.createElement("h2");
       secHeader.textContent = secNode.getAttribute("title");
