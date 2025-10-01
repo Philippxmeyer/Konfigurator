@@ -253,16 +253,16 @@
   </bodenOffsets>
     <containerOffsets>
     <!-- 750 mm: nur links/rechts -->
-    <item breite="750" side="left"  x="12" y="380" scaleX="0.25" scaleY="0.25"/>
-    <item breite="750" side="right" x="210" y="380" scaleX="0.25" scaleY="0.25"/>
+    <item breite="750" side="left"  x="12" y="378" scaleX="0.25" scaleY="0.25"/>
+    <item breite="750" side="right" x="210" y="378" scaleX="0.25" scaleY="0.25"/>
 
     <!-- 1500 mm: links/rechts/links+rechts -->
-    <item breite="1500" side="left"  x="11" y="379" scaleX="0.25" scaleY="0.25"/>
-    <item breite="1500" side="right" x="425" y="380" scaleX="0.25" scaleY="0.25"/>
+    <item breite="1500" side="left"  x="11" y="377" scaleX="0.25" scaleY="0.25"/>
+    <item breite="1500" side="right" x="425" y="378" scaleX="0.25" scaleY="0.25"/>
 
     <!-- 2000 mm: links/rechts/links+rechts -->
-    <item breite="2000" side="left"  x="11" y="379" scaleX="0.25" scaleY="0.25"/>
-    <item breite="2000" side="right" x="565" y="380" scaleX="0.25" scaleY="0.25"/>
+    <item breite="2000" side="left"  x="11" y="377" scaleX="0.25" scaleY="0.25"/>
+    <item breite="2000" side="right" x="565" y="378" scaleX="0.25" scaleY="0.25"/>
   </containerOffsets>
     <ablagebordOffsets>
   <item id="ablagebord-buche-750"  x="22" y="461" scaleX="0.445" scaleY="0.42"/>
