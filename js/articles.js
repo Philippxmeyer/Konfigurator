@@ -1,107 +1,137 @@
 import { lookupArticle } from "./articleLoader.js";
 
+const currencyFormatter = new Intl.NumberFormat("de-DE", {
+  style: "currency",
+  currency: "EUR",
+});
+
+const labelOverrides = {
+  weiss: "Weiß",
+  weissaluminium: "Weißaluminium",
+  lichtgrau: "Lichtgrau",
+  blau: "Blau",
+  anthrazit: "Anthrazit",
+  niedrig: "Niedrig",
+  hoch: "Hoch",
+  buche: "Buche",
+  weissbuche: "Weißbuche",
+};
+
+function normalizeLabel(value) {
+  if (!value) return "";
+  if (labelOverrides[value]) return labelOverrides[value];
+  return value
+    .split(/[-_]/)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function labelWithQuantity(baseLabel, quantity) {
+  return quantity > 1 ? `${baseLabel} x${quantity}` : baseLabel;
+}
+
+export function formatCurrency(value) {
+  if (value === null || value === undefined || Number.isNaN(value)) {
+    return "–";
+  }
+  return currencyFormatter.format(value);
+}
+
+export function calculatePriceSummary(items) {
+  let total = 0;
+  let hasMissing = false;
+
+  items.forEach(item => {
+    if (item.unitPrice === null || item.unitPrice === undefined) {
+      hasMissing = true;
+      return;
+    }
+
+    const quantity = item.quantity ?? 1;
+    total += item.unitPrice * quantity;
+  });
+
+  return { total, hasMissing };
+}
+
 export function buildArticleItems(values) {
   const items = [];
+  const addArticle = (label, article, quantity = 1) => {
+    if (!article || !article.number) return;
+    items.push({
+      label,
+      code: article.number,
+      quantity,
+      unitPrice: article.price ?? null,
+    });
+  };
 
-  // --- Grundtisch ---
   const grundKey = `${values.gestell}-${values.farbe}-${values.platte}-${values.breite}`;
-  const grundNum = lookupArticle("grundtisch", grundKey);
+  addArticle("Grundtisch", lookupArticle("grundtisch", grundKey));
 
-  if (grundNum) items.push({ label: "Grundtisch", code: grundNum, quantity: 1 });
-
-  // --- Seitenblenden ---
   if (values.seitenblende !== "ohne") {
-    const farbe = (values.seitenfarbe === "gestell") ? values.farbe : values.seitenfarbe;
-    const num = lookupArticle("seitenblende", farbe);
-
-    if (num) {
-      const qty = values.seitenblende === "links-rechts" ? 2 : 1;
-      items.push({ label: `Seitenblende (${farbe}) x${qty}`, code: num, quantity: qty });
-    }
+    const farbe = values.seitenfarbe === "gestell" ? values.farbe : values.seitenfarbe;
+    const qty = values.seitenblende === "links-rechts" ? 2 : 1;
+    const article = lookupArticle("seitenblende", farbe);
+    const label = labelWithQuantity(`Seitenblende (${normalizeLabel(farbe)})`, qty);
+    addArticle(label, article, qty);
   }
 
-  // --- Aufbau ---
   if (values.aufbau !== "ohne") {
-    const num = lookupArticle("aufbau", values.aufbau);
-
-    if (num) items.push({ label: `Aufbau ${values.aufbau}`, code: num, quantity: 1 });
+    const label = `Aufbau ${normalizeLabel(values.aufbau)}`;
+    addArticle(label, lookupArticle("aufbau", values.aufbau));
   }
 
-  // --- Böden ---
   if (values.bodenanzahl && values.bodenanzahl !== "0") {
     const key = `${values.farbe}-${values.breite}`;
-    const num = lookupArticle("boden", key);
-
-    if (num) {
-      const qty = parseInt(values.bodenanzahl, 10);
-      if (qty > 0) {
-        items.push({ label: `Boden (${values.farbe}) x${values.bodenanzahl}`, code: num, quantity: qty });
-      }
+    const qty = parseInt(values.bodenanzahl, 10);
+    if (qty > 0) {
+      const label = labelWithQuantity(`Boden (${normalizeLabel(values.farbe)})`, qty);
+      addArticle(label, lookupArticle("boden", key), qty);
     }
   }
 
-  // --- Lochrasterplatten ---
   if (values.plattenanzahl && values.plattenanzahl !== "0") {
     const key = `${values.farbe}-${values.breite}`;
-    const num = lookupArticle("platte", key);
-
-    if (num) {
-      const qty = parseInt(values.plattenanzahl, 10);
-      if (qty > 0) {
-        items.push({ label: `Lochrasterplatte (${values.farbe}) x${values.plattenanzahl}`, code: num, quantity: qty });
-      }
+    const qty = parseInt(values.plattenanzahl, 10);
+    if (qty > 0) {
+      const label = labelWithQuantity(`Lochrasterplatte (${normalizeLabel(values.farbe)})`, qty);
+      addArticle(label, lookupArticle("platte", key), qty);
     }
   }
 
-  // --- Container ---
   if (values.containerpos && values.containerpos !== "ohne") {
     const contFarbe = values.containerfarbe === "gestell" ? values.farbe : values.containerfarbe;
     const contKey = `${values.farbe}-${contFarbe}`;
 
-    const num = lookupArticle("container", contKey);
+    let count = 0;
+    if (values.containerpos === "links" || values.containerpos === "rechts") count = 1;
+    if (values.containerpos === "links-rechts") count = 2;
 
-    if (num) {
-      let count = 0;
-      if (values.containerpos === "links" || values.containerpos === "rechts") count = 1;
-      if (values.containerpos === "links-rechts") count = 2;
-
-      if (count > 0) {
-        items.push({ label: `Container (${contFarbe}) x${count}`, code: num, quantity: count });
-      }
+    if (count > 0) {
+      const label = labelWithQuantity(`Container (${normalizeLabel(contFarbe)})`, count);
+      addArticle(label, lookupArticle("container", contKey), count);
     }
   }
 
-  // --- Laufschienen ---
   if (values.laufschienenanzahl && values.laufschienenanzahl !== "0") {
-    const key = values.breite; // Keys sind nur "750", "1500", "2000"
-
-    const num = lookupArticle("laufschiene", key);
-
-    if (num) {
-      const qty = parseInt(values.laufschienenanzahl, 10);
-      if (qty > 0) {
-        items.push({ label: `Laufschiene x${values.laufschienenanzahl}`, code: num, quantity: qty });
-      }
+    const qty = parseInt(values.laufschienenanzahl, 10);
+    if (qty > 0) {
+      const label = labelWithQuantity(`Laufschiene (${values.breite} mm)`, qty);
+      addArticle(label, lookupArticle("laufschiene", values.breite), qty);
     }
   }
 
-  // --- Ablagebord ---
   if (values.ablagebord && values.ablagebord !== "ohne") {
     const key = `${values.ablagebord}-${values.breite}`; // buche-1500 / weiss-2000
-    const num = lookupArticle("ablagebord", key);
-    console.log("Ablagebord:", key, "→", num);
-    if (num) {
-      const labelName = values.ablagebord === "weiss" ? "Weiß" : "Buche";
-      items.push({ label: `Ablagebord (${labelName})`, code: num, quantity: 1 });
-    }
+    const article = lookupArticle("ablagebord", key);
+    const labelName = values.ablagebord === "weiss" ? "Weiß" : "Buche";
+    addArticle(`Ablagebord (${labelName})`, article);
   }
 
   return items;
 }
 
-/**
- * Baut die Artikelliste auf Basis der aktuellen Auswahl
- */
 export function renderArticleList(values) {
   const list = document.getElementById("articleItems");
   if (!list) return;
@@ -111,18 +141,47 @@ export function renderArticleList(values) {
     actionsRoot.hidden = true;
   }
   list.innerHTML = "";
+
+  const sidebarTotal = document.getElementById("sidebarTotal");
+  const overlaySummary = document.getElementById("articleOverlaySummary");
+  const overlayTotal = document.getElementById("articleOverlayTotal");
+
   const items = buildArticleItems(values);
+  const priceSummary = calculatePriceSummary(items);
 
-  // --- Rendern (Listenelemente klickbar) ---
-  const BASE = "https://www.schaefer-shop.de/product/search?query=";
+  const hasItems = items.length > 0;
+  const totalText = !hasItems
+    ? "–"
+    : priceSummary.hasMissing
+      ? "Preis auf Anfrage"
+      : formatCurrency(priceSummary.total);
 
-  if (items.length === 0) {
+  if (sidebarTotal) {
+    sidebarTotal.textContent = totalText;
+    sidebarTotal.classList.toggle("sidebar-summary__value--missing", priceSummary.hasMissing);
+    sidebarTotal.dataset.totalValue = priceSummary.hasMissing || !hasItems ? "" : priceSummary.total.toFixed(2);
+  }
+
+  if (overlayTotal) {
+    overlayTotal.textContent = totalText;
+    overlayTotal.classList.toggle("article-overlay__total--missing", priceSummary.hasMissing);
+    overlayTotal.dataset.totalValue = priceSummary.hasMissing || !hasItems ? "" : priceSummary.total.toFixed(2);
+  }
+
+  if (overlaySummary) {
+    overlaySummary.hidden = !hasItems;
+  }
+
+  if (!hasItems) {
     const empty = document.createElement("li");
     empty.className = "article-overlay__empty";
     empty.textContent = "Keine Artikeldaten verfügbar.";
     list.appendChild(empty);
     return;
   }
+
+  // --- Rendern (Listenelemente klickbar) ---
+  const BASE = "https://www.schaefer-shop.de/product/search?query=";
 
   items.forEach(item => {
     const li = document.createElement("li");
@@ -158,8 +217,23 @@ export function renderArticleList(values) {
     code.className = "code";
     code.textContent = item.code;
 
+    const quantity = item.quantity ?? 1;
+    const price = document.createElement("span");
+    price.className = "article-link__price";
+
+    if (item.unitPrice === null || item.unitPrice === undefined) {
+      price.textContent = "Preis auf Anfrage";
+      price.classList.add("article-link__price--missing");
+    } else if (quantity > 1) {
+      const total = item.unitPrice * quantity;
+      price.textContent = `${formatCurrency(item.unitPrice)} × ${quantity} = ${formatCurrency(total)}`;
+    } else {
+      price.textContent = formatCurrency(item.unitPrice);
+    }
+
     content.appendChild(header);
     content.appendChild(code);
+    content.appendChild(price);
 
     a.appendChild(thumb);
     a.appendChild(content);

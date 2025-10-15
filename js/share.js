@@ -83,56 +83,56 @@ export function updateURL(values) {
 
 function buildEmailBody(items, configLink) {
   const introLines = [
-    "Hallo,",
-    "",
-    "bitte senden Sie mir ein Angebot für folgende Konfiguration:",
-    ""
+    "<p>Hallo,</p>",
+    "<p>bitte senden Sie mir ein Angebot für folgende Konfiguration:</p>"
   ];
 
   const table = formatItemsTable(items);
 
   const outroLines = [
-    "",
-    `Konfigurationslink: ${configLink}`,
-    "",
-    "Vielen Dank!"
+    `<p>Konfigurationslink: <a href="${configLink}">${configLink}</a></p>`,
+    "<p>Vielen Dank!</p>"
   ];
 
-  return [...introLines, table, ...outroLines].join("\n").trimEnd();
+  const bodyParts = [
+    "<html>",
+    "<body>",
+    ...introLines,
+    table,
+    ...outroLines,
+    "</body>",
+    "</html>"
+  ];
+
+  return bodyParts.join("\n").trimEnd();
 }
 
 function formatItemsTable(items) {
   if (!items.length) {
-    return "Keine Artikeldaten verfügbar.";
+    return "<p>Keine Artikeldaten verfügbar.</p>";
   }
 
-  const columns = [
-    {
-      header: "Artikel",
-      getter: item => item.label
-    },
-    {
-      header: "Artikelnummer",
-      getter: item => item.code
-    },
-    {
-      header: "Menge",
-      getter: item => String(item.quantity ?? 1)
-    }
-  ];
-
-  const rows = items.map(item => columns.map(col => col.getter(item)));
-
-  const colWidths = columns.map((col, index) => {
-    const cellLengths = rows.map(row => row[index].length);
-    return Math.max(col.header.length, ...cellLengths);
+  const tableRows = items.map(item => {
+    const quantity = item.quantity ?? 1;
+    return `    <tr>
+      <td style="padding: 4px 8px; border: 1px solid #d0d0d0;">${item.label}</td>
+      <td style="padding: 4px 8px; border: 1px solid #d0d0d0;">${item.code}</td>
+      <td style="padding: 4px 8px; border: 1px solid #d0d0d0; text-align: right;">${quantity}</td>
+    </tr>`;
   });
 
-  const formatRow = row => row.map((cell, index) => cell.padEnd(colWidths[index])).join(" | ");
-
-  const headerLine = formatRow(columns.map(col => col.header));
-  const separatorLine = colWidths.map(width => "-".repeat(width)).join("-+-");
-  const dataLines = rows.map(formatRow);
-
-  return [headerLine, separatorLine, ...dataLines].join("\n");
+  return [
+    "<table style=\"border-collapse: collapse; width: 100%; max-width: 480px;\">",
+    "  <thead>",
+    "    <tr>",
+    "      <th style=\"text-align: left; padding: 4px 8px; border: 1px solid #d0d0d0;\">Artikel</th>",
+    "      <th style=\"text-align: left; padding: 4px 8px; border: 1px solid #d0d0d0;\">Artikelnummer</th>",
+    "      <th style=\"text-align: right; padding: 4px 8px; border: 1px solid #d0d0d0;\">Menge</th>",
+    "    </tr>",
+    "  </thead>",
+    "  <tbody>",
+    ...tableRows,
+    "  </tbody>",
+    "</table>"
+  ].join("\n");
 }
