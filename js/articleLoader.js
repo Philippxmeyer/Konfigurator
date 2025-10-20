@@ -15,5 +15,11 @@ export async function loadArticles() {
 export function lookupArticle(type, key) {
   if (!articleXML) return null;
   const node = articleXML.querySelector(`${type}[key="${key}"]`);
-  return node ? node.getAttribute("number") : null;
+  if (!node) return null;
+
+  const number = node.getAttribute("number");
+  const priceAttr = node.getAttribute("price");
+  const price = priceAttr ? parseFloat(priceAttr) : null;
+
+  return { number, price };
 }

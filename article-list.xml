@@ -1,62 +1,62 @@
 <articles>
 <!-- Grundtische -->
-<grundtisch key="ast31-lichtgrau-buche-750" number="403872"/>
-<grundtisch key="ast31-lichtgrau-buche-1500" number="403880"/>
-<grundtisch key="ast31-lichtgrau-buche-2000" number="403884"/>
-<grundtisch key="ast31-lichtgrau-weiss-750" number="403871"/>
-<grundtisch key="ast31-lichtgrau-weiss-1500" number="403879"/>
-<grundtisch key="ast31-lichtgrau-weiss-2000" number="403883"/>
-<grundtisch key="ast31-weissaluminium-buche-750" number="403874"/>
-<grundtisch key="ast31-weissaluminium-buche-1500" number="403882"/>
-<grundtisch key="ast31-weissaluminium-buche-2000" number="403886"/>
-<grundtisch key="ast31-weissaluminium-weiss-750" number="403873"/>
-<grundtisch key="ast31-weissaluminium-weiss-1500" number="403881"/>
-<grundtisch key="ast31-weissaluminium-weiss-2000" number="403885"/>
-<grundtisch key="ast31-el-weissaluminium-buche-750" number="403888"/>
-<grundtisch key="ast31-el-weissaluminium-buche-1500" number="403892"/>
-<grundtisch key="ast31-el-weissaluminium-buche-2000" number="403894"/>
-<grundtisch key="ast31-el-weissaluminium-weiss-750" number="403887"/>
-<grundtisch key="ast31-el-weissaluminium-weiss-1500" number="403891"/>
-<grundtisch key="ast31-el-weissaluminium-weiss-2000" number="403893"/>
+<grundtisch key="ast31-lichtgrau-buche-750" number="403872" price="419.00"/>
+<grundtisch key="ast31-lichtgrau-buche-1500" number="403880" price="499.00"/>
+<grundtisch key="ast31-lichtgrau-buche-2000" number="403884" price="529.00"/>
+<grundtisch key="ast31-lichtgrau-weiss-750" number="403871" price="399.00"/>
+<grundtisch key="ast31-lichtgrau-weiss-1500" number="403879" price="419.00"/>
+<grundtisch key="ast31-lichtgrau-weiss-2000" number="403883" price="499.00"/>
+<grundtisch key="ast31-weissaluminium-buche-750" number="403874" price="419.00"/>
+<grundtisch key="ast31-weissaluminium-buche-1500" number="403882" price="499.00"/>
+<grundtisch key="ast31-weissaluminium-buche-2000" number="403886" price="529.00"/>
+<grundtisch key="ast31-weissaluminium-weiss-750" number="403873" price="399.00"/>
+<grundtisch key="ast31-weissaluminium-weiss-1500" number="403881" price="419.00"/>
+<grundtisch key="ast31-weissaluminium-weiss-2000" number="403885" price="499.00"/>
+<grundtisch key="ast31-el-weissaluminium-buche-750" number="403888" price="2799.00"/>
+<grundtisch key="ast31-el-weissaluminium-buche-1500" number="403892" price="2899.00"/>
+<grundtisch key="ast31-el-weissaluminium-buche-2000" number="403894" price="2949.00"/>
+<grundtisch key="ast31-el-weissaluminium-weiss-750" number="403887" price="2799.00"/>
+<grundtisch key="ast31-el-weissaluminium-weiss-1500" number="403891" price="2899.00"/>
+<grundtisch key="ast31-el-weissaluminium-weiss-2000" number="403893" price="2949.00"/>
 <!-- Seitenblenden (unabhängig von Breite, links/rechts identisch) -->
-<seitenblende key="lichtgrau" number="403818"/>
-<seitenblende key="weissaluminium" number="403820"/>
-<seitenblende key="blau" number="403822"/>
-<seitenblende key="anthrazit" number="403824"/>
+<seitenblende key="lichtgrau" number="403818" price="49.99"/>
+<seitenblende key="weissaluminium" number="403820" price="49.99"/>
+<seitenblende key="blau" number="403822" price="49.99"/>
+<seitenblende key="anthrazit" number="403824" price="49.99"/>
 <!-- Aufbauten (nur hoch/niedrig, breitenunabhängig) -->
-<aufbau key="niedrig" number="403808"/>
-<aufbau key="hoch" number="403809"/>
+<aufbau key="niedrig" number="403808" price="89.00"/>
+<aufbau key="hoch" number="403809" price="159.00"/>
 <!-- Böden -->
-<boden key="lichtgrau-750" number="402975"/>
-<boden key="lichtgrau-1500" number="402977"/>
-<boden key="lichtgrau-2000" number="402979"/>
-<boden key="weissaluminium-750" number="402976"/>
-<boden key="weissaluminium-1500" number="402978"/>
-<boden key="weissaluminium-2000" number="402980"/>
+<boden key="lichtgrau-750" number="402975" price="99.00"/>
+<boden key="lichtgrau-1500" number="402977" price="109.00"/>
+<boden key="lichtgrau-2000" number="402979" price="119.00"/>
+<boden key="weissaluminium-750" number="402976" price="99.00"/>
+<boden key="weissaluminium-1500" number="402978" price="109.00"/>
+<boden key="weissaluminium-2000" number="402980" price="119.00"/>
 <!-- Lochrasterplatten -->
-<platte key="lichtgrau-750" number="403810"/>
-<platte key="lichtgrau-1500" number="403812"/>
-<platte key="lichtgrau-2000" number="403813"/>
-<platte key="weissaluminium-750" number="403814"/>
-<platte key="weissaluminium-1500" number="403816"/>
-<platte key="weissaluminium-2000" number="403817"/>
+<platte key="lichtgrau-750" number="403810" price="49.99"/>
+<platte key="lichtgrau-1500" number="403812" price="59.00"/>
+<platte key="lichtgrau-2000" number="403813" price="65.00"/>
+<platte key="weissaluminium-750" number="403814" price="49.99"/>
+<platte key="weissaluminium-1500" number="403816" price="59.00"/>
+<platte key="weissaluminium-2000" number="403817" price="65.00"/>
 <!-- Container -->
-<container key="lichtgrau-lichtgrau" number="404791"/>
-<container key="lichtgrau-blau" number="404792"/>
-<container key="lichtgrau-anthrazit" number="404795"/>
-<container key="weissaluminium-weissaluminium" number="404799"/>
-<container key="weissaluminium-blau" number="404797"/>
-<container key="weissaluminium-anthrazit" number="404796"/>
+<container key="lichtgrau-lichtgrau" number="404791" price="369.00"/>
+<container key="lichtgrau-blau" number="404792" price="369.00"/>
+<container key="lichtgrau-anthrazit" number="404795" price="369.00"/>
+<container key="weissaluminium-weissaluminium" number="404799" price="369.00"/>
+<container key="weissaluminium-blau" number="404797" price="369.00"/>
+<container key="weissaluminium-anthrazit" number="404796" price="369.00"/>
 <!-- Laufschienen -->
-<laufschiene key="750" number="402964"/>
-<laufschiene key="1500" number="402965"/>
-<laufschiene key="2000" number="402966"/>
+<laufschiene key="750" number="402964" price="99.00"/>
+<laufschiene key="1500" number="402965" price="129.00"/>
+<laufschiene key="2000" number="402966" price="129.00"/>
 <!-- Ablageborde -->
-<ablagebord key="buche-750"  number="403834"/>
-<ablagebord key="buche-1500" number="403836"/>
-<ablagebord key="buche-2000" number="403837"/>
-<ablagebord key="weiss-750"  number="400039"/>
-<ablagebord key="weiss-1500" number="400049"/>
-<ablagebord key="weiss-2000" number="400059"/>
+<ablagebord key="buche-750"  number="403834" price="109.00"/>
+<ablagebord key="buche-1500" number="403836" price="159.00"/>
+<ablagebord key="buche-2000" number="403837" price="179.00"/>
+<ablagebord key="weiss-750"  number="400039" price="109.00"/>
+<ablagebord key="weiss-1500" number="400049" price="159.00"/>
+<ablagebord key="weiss-2000" number="400059" price="179.00"/>
 
 </articles>

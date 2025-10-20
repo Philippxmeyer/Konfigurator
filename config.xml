@@ -48,8 +48,8 @@
       <wert id="2000">2000 mm</wert>
     </breiten>
     <gestelle>
-      <wert id="ast31" default="true">AST31</wert>
-      <wert id="ast31-el">AST31-EL</wert>
+      <wert id="ast31" default="true">Manuell höhenverstellbar</wert>
+      <wert id="ast31-el">Elektrisch höheneinstellbar</wert>
     </gestelle>
     <farben>
       <wert id="lichtgrau">Lichtgrau</wert>
