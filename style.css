@@ -199,11 +199,9 @@ button {
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px 18px;
+  padding: 8px 18px;
   border: 1px solid rgba(148, 163, 184, 0.3);
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(241, 245, 249, 0.95) 100%);
-  box-shadow: 0 28px 40px -32px rgba(15, 23, 42, 0.45);
+  background: linear-gradient(180deg, rgba(246, 248, 255, 0.9) 0%, rgba(236, 240, 250, 0.9) 100%);
 }
 
 .sidebar-summary__label {
