@@ -662,7 +662,7 @@ select:focus-visible {
   background: linear-gradient(135deg, rgba(250, 252, 255, 0.95), rgba(236, 239, 246, 0.95));
 }
 
-.article-overlay__summary .article-overlay__quantity {
+.article-overlay__summary, .article-overlay__quantity {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
