@@ -132,10 +132,18 @@ export function buildArticleItems(values) {
   return items;
 }
 
-export function renderArticleList(values) {
+export function renderArticleList(values, tableQuantity = 1) {
   const list = document.getElementById("articleItems");
-  if (!list) return;
   const actionsRoot = document.getElementById("articleOverlayActions");
+  if (!list) {
+    return {
+      items: [],
+      priceSummary: { total: 0, hasMissing: false },
+      hasItems: false,
+      aggregatedTotal: null,
+      hasMissingPrice: false,
+    };
+  }
   if (actionsRoot) {
     actionsRoot.innerHTML = "";
     actionsRoot.hidden = true;
@@ -148,8 +156,13 @@ export function renderArticleList(values) {
 
   const items = buildArticleItems(values);
   const priceSummary = calculatePriceSummary(items);
-
   const hasItems = items.length > 0;
+  const numericQuantity = Number.parseInt(tableQuantity, 10);
+  const sanitizedQuantity = Number.isFinite(numericQuantity) && numericQuantity > 0 ? numericQuantity : 1;
+  const aggregatedTotal = !priceSummary.hasMissing && hasItems
+    ? priceSummary.total * sanitizedQuantity
+    : null;
+
   const totalText = !hasItems
     ? "–"
     : priceSummary.hasMissing
@@ -160,12 +173,14 @@ export function renderArticleList(values) {
     sidebarTotal.textContent = totalText;
     sidebarTotal.classList.toggle("sidebar-summary__value--missing", priceSummary.hasMissing);
     sidebarTotal.dataset.totalValue = priceSummary.hasMissing || !hasItems ? "" : priceSummary.total.toFixed(2);
+    sidebarTotal.dataset.tableQuantity = String(sanitizedQuantity);
   }
 
   if (overlayTotal) {
     overlayTotal.textContent = totalText;
     overlayTotal.classList.toggle("article-overlay__total--missing", priceSummary.hasMissing);
     overlayTotal.dataset.totalValue = priceSummary.hasMissing || !hasItems ? "" : priceSummary.total.toFixed(2);
+    overlayTotal.dataset.tableQuantity = String(sanitizedQuantity);
   }
 
   if (overlaySummary) {
@@ -177,7 +192,13 @@ export function renderArticleList(values) {
     empty.className = "article-overlay__empty";
     empty.textContent = "Keine Artikeldaten verfügbar.";
     list.appendChild(empty);
-    return;
+    return {
+      items,
+      priceSummary,
+      hasItems,
+      aggregatedTotal: null,
+      hasMissingPrice: priceSummary.hasMissing,
+    };
   }
 
   // --- Rendern (Listenelemente klickbar) ---
@@ -258,8 +279,10 @@ export function renderArticleList(values) {
     };
 
     items.forEach(item => {
+      const baseQuantity = item.quantity ?? 1;
+      const effectiveQuantity = baseQuantity * sanitizedQuantity;
       appendHiddenInput("articleId", item.code);
-      appendHiddenInput("quantity", String(item.quantity ?? 1));
+      appendHiddenInput("quantity", String(effectiveQuantity));
     });
 
     appendHiddenInput("submit", "");
@@ -269,10 +292,22 @@ export function renderArticleList(values) {
     submitBtn.className = "btn";
     submitBtn.id = "submitBtn";
     submitBtn.formTarget = "_blank";
-    submitBtn.textContent = "In den Warenkorb legen";
+    if (aggregatedTotal !== null) {
+      submitBtn.textContent = `In den Warenkorb legen`;
+    } else {
+      submitBtn.textContent = "Fehler";
+    }
     form.appendChild(submitBtn);
 
     actionsRoot.appendChild(form);
     actionsRoot.hidden = false;
   }
+
+  return {
+    items,
+    priceSummary,
+    hasItems,
+    aggregatedTotal,
+    hasMissingPrice: priceSummary.hasMissing,
+  };
 }

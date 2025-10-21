@@ -5,12 +5,24 @@ import { decodeConfig } from "./share.js";
 import { updatePreview } from "./preview.js";
 import { loadArticles } from "./articleLoader.js";
 import { initPreviewZoom } from "./zoom.js";
+import { formatCurrency } from "./articles.js";
 import "./systemMonitor.js";
 
 let configXML;
 const images = {};
 let lastKnownValues = {};
 const sectionHighlightTimeouts = new WeakMap();
+let lastArticleResult = null;
+
+const MIN_TABLE_QUANTITY = 1;
+const MAX_TABLE_QUANTITY = 99;
+let tableQuantity = 1;
+
+let quantityRoot;
+let quantityCountEl;
+let quantityTotalEl;
+let quantityDecrementBtn;
+let quantityIncrementBtn;
 
 function getSidebarSelects() {
   return document.querySelectorAll(".sidebar select");
@@ -22,6 +34,119 @@ function collectSidebarValues() {
     values[sel.id] = sel.value;
   });
   return values;
+}
+
+function clampTableQuantity(value) {
+  const numeric = Number.isFinite(value) ? value : Number.parseInt(String(value), 10);
+  if (!Number.isFinite(numeric)) return MIN_TABLE_QUANTITY;
+  return Math.min(MAX_TABLE_QUANTITY, Math.max(MIN_TABLE_QUANTITY, numeric));
+}
+
+function updateQuantityButtons() {
+  if (!quantityDecrementBtn || !quantityIncrementBtn) return;
+  quantityDecrementBtn.disabled = tableQuantity <= MIN_TABLE_QUANTITY;
+  quantityIncrementBtn.disabled = tableQuantity >= MAX_TABLE_QUANTITY;
+}
+
+function updateQuantitySummary(articleResult) {
+  if (!quantityCountEl || !quantityTotalEl) return;
+
+  quantityCountEl.textContent = String(tableQuantity);
+
+  const hasItems = Boolean(articleResult?.hasItems);
+  if (!hasItems) {
+    quantityTotalEl.textContent = "Gesamt: –";
+    quantityTotalEl.classList.remove("article-overlay__quantity-total--missing");
+    return;
+  }
+
+  if (articleResult?.hasMissingPrice) {
+    quantityTotalEl.textContent = "Gesamt: Preis auf Anfrage";
+    quantityTotalEl.classList.add("article-overlay__quantity-total--missing");
+    return;
+  }
+
+  const total = articleResult?.aggregatedTotal;
+  if (typeof total === "number") {
+    quantityTotalEl.textContent = `Gesamt: ${formatCurrency(total)}`;
+    quantityTotalEl.classList.remove("article-overlay__quantity-total--missing");
+  } else if (articleResult?.priceSummary && typeof articleResult.priceSummary.total === "number") {
+    const aggregated = articleResult.priceSummary.total * tableQuantity;
+    quantityTotalEl.textContent = `Gesamt: ${formatCurrency(aggregated)}`;
+    quantityTotalEl.classList.remove("article-overlay__quantity-total--missing");
+  } else {
+    quantityTotalEl.textContent = "Gesamt: –";
+    quantityTotalEl.classList.remove("article-overlay__quantity-total--missing");
+  }
+}
+
+function refreshPreview() {
+  if (!configXML) return null;
+  const result = updatePreview(configXML, images, { tableQuantity });
+  lastArticleResult = result?.articleResult ?? null;
+  updateQuantitySummary(lastArticleResult);
+  return result;
+}
+
+function setTableQuantity(newQuantity, { triggerPreview = true } = {}) {
+  const clamped = clampTableQuantity(newQuantity);
+  if (clamped === tableQuantity) {
+    updateQuantityButtons();
+    updateQuantitySummary(lastArticleResult);
+    return;
+  }
+  tableQuantity = clamped;
+  updateQuantityButtons();
+  updateQuantitySummary(lastArticleResult);
+  if (triggerPreview) {
+    refreshPreview();
+  }
+}
+
+function handleQuantityStep(delta) {
+  setTableQuantity(tableQuantity + delta);
+}
+
+function setupQuantityControl() {
+  quantityRoot = document.getElementById("articleOverlayQuantity");
+  if (!quantityRoot) return;
+
+  quantityRoot.innerHTML = `
+    <span class="article-overlay__quantity-label" id="articleOverlayQuantityLabel">Menge</span>
+    <div class="article-overlay__quantity-controls" role="group" aria-labelledby="articleOverlayQuantityLabel">
+      <button type="button" class="article-overlay__quantity-step article-overlay__quantity-step--decrement" aria-label="Menge verringern">
+        <span aria-hidden="true">−</span>
+      </button>
+      <div class="article-overlay__quantity-value" role="status" aria-live="polite">
+        <span class="article-overlay__quantity-count">1</span>
+      </div>
+      <button type="button" class="article-overlay__quantity-step article-overlay__quantity-step--increment" aria-label="Menge erhöhen">
+        <span aria-hidden="true">+</span>
+      </button>
+    </div>
+    <span class="article-overlay__quantity-total">Gesamt: –</span>
+  `;
+
+  quantityCountEl = quantityRoot.querySelector(".article-overlay__quantity-count");
+  quantityTotalEl = quantityRoot.querySelector(".article-overlay__quantity-total");
+  quantityDecrementBtn = quantityRoot.querySelector(".article-overlay__quantity-step--decrement");
+  quantityIncrementBtn = quantityRoot.querySelector(".article-overlay__quantity-step--increment");
+
+  quantityDecrementBtn?.addEventListener("click", () => handleQuantityStep(-1));
+  quantityIncrementBtn?.addEventListener("click", () => handleQuantityStep(1));
+
+  quantityRoot.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+      event.preventDefault();
+      handleQuantityStep(-1);
+    } else if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+      event.preventDefault();
+      handleQuantityStep(1);
+    }
+  });
+
+  updateQuantityButtons();
+  updateQuantitySummary(lastArticleResult);
 }
 
 function ensureSectionIsVisible(section) {
@@ -184,7 +309,7 @@ function handleSidebarChange({ id, previousValue }) {
   if (!configXML) return;
 
   const beforeValues = { ...lastKnownValues };
-  updatePreview(configXML, images);
+  refreshPreview();
 
   const newValues = collectSidebarValues();
 
@@ -216,7 +341,7 @@ function handleSidebarChange({ id, previousValue }) {
         if (select) {
           select.value = previousValue;
         }
-        updatePreview(configXML, images);
+        refreshPreview();
         lastKnownValues = collectSidebarValues();
         updatePreviousValueDatasets();
         return;
@@ -305,10 +430,22 @@ function loadFromURL() {
   const values = decodeConfig(params.get("config"));
   if (!values) return;
 
+  let quantityFromConfig = null;
   Object.entries(values).forEach(([id, val]) => {
+    if (id === "tableQuantity") {
+      const parsed = Number.parseInt(val, 10);
+      if (Number.isFinite(parsed) && parsed > 0) {
+        quantityFromConfig = parsed;
+      }
+      return;
+    }
     const sel = document.getElementById(id);
     if (sel) sel.value = val;
   });
+
+  if (quantityFromConfig !== null) {
+    setTableQuantity(quantityFromConfig, { triggerPreview: false });
+  }
 }
 
 async function init() {
@@ -322,6 +459,8 @@ async function init() {
   // 2) Sidebar bauen (setzt Defaults aus config.xml)
   const sidebarEl = document.getElementById("sidebar");
   buildSidebar(configXML, sidebarEl, handleSidebarChange);
+
+  setupQuantityControl();
 
   // 3) Layer-Images vorbereiten – in #stage einhängen (Fallback: #preview)
   const stage = document.getElementById("stage") || document.getElementById("preview");
@@ -346,7 +485,7 @@ async function init() {
   loadFromURL();
 
   // 6) Erste Darstellung
-  updatePreview(configXML, images);
+  refreshPreview();
   lastKnownValues = collectSidebarValues();
   updatePreviousValueDatasets();
 }

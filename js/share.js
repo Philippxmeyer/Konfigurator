@@ -14,7 +14,8 @@ const fieldOrder = [
   "containerfarbe",
   "containerpos",
   "laufschienenanzahl",
-  "ablagebord"    
+  "ablagebord",
+  "tableQuantity",
 ];
 
 let lastConfigValues = {};
@@ -71,8 +72,9 @@ export function updateURL(values) {
 
   requestBtn.onclick = () => {
     const items = buildArticleItems(lastConfigValues);
+    const tableQuantity = Math.max(1, Number.parseInt(lastConfigValues.tableQuantity ?? "1", 10) || 1);
     const subject = "Konfiguration anfragen";
-    const body = buildEmailBody(items, lastConfigURL);
+    const body = buildEmailBody(items, lastConfigURL, tableQuantity);
     const encodedSubject = encodeURIComponent(subject);
     const encodedBody = encodeURIComponent(body).replace(/%0A/g, "%0D%0A");
     const mailto = `mailto:test@123.de?subject=${encodedSubject}&body=${encodedBody}`;
@@ -81,13 +83,14 @@ export function updateURL(values) {
   };
 }
 
-function buildEmailBody(items, configLink) {
+function buildEmailBody(items, configLink, tableQuantity = 1) {
   const introLines = [
     "<p>Hallo,</p>",
-    "<p>bitte senden Sie mir ein Angebot für folgende Konfiguration:</p>"
+    "<p>bitte senden Sie mir ein Angebot für folgende Konfiguration:</p>",
+    `<p>Menge: ${tableQuantity} ${tableQuantity === 1 ? "Tisch" : "Tische"}</p>`
   ];
 
-  const table = formatItemsTable(items);
+  const table = formatItemsTable(items, tableQuantity);
 
   const outroLines = [
     `<p>Konfigurationslink: <a href="${configLink}">${configLink}</a></p>`,
@@ -107,13 +110,14 @@ function buildEmailBody(items, configLink) {
   return bodyParts.join("\n").trimEnd();
 }
 
-function formatItemsTable(items) {
+function formatItemsTable(items, multiplier = 1) {
   if (!items.length) {
     return "<p>Keine Artikeldaten verfügbar.</p>";
   }
 
   const tableRows = items.map(item => {
-    const quantity = item.quantity ?? 1;
+    const baseQuantity = item.quantity ?? 1;
+    const quantity = baseQuantity * multiplier;
     return `    <tr>
       <td style="padding: 4px 8px; border: 1px solid #d0d0d0;">${item.label}</td>
       <td style="padding: 4px 8px; border: 1px solid #d0d0d0;">${item.code}</td>

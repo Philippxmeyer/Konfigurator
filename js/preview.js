@@ -5,7 +5,9 @@ import { renderArticleList } from "./articles.js";
 import { updateURL } from "./share.js";
 import { syncSliderControls } from "./uiBuilder.js";
 
-export function updatePreview(configXML, images) {
+export function updatePreview(configXML, images, options = {}) {
+  const numericQuantity = Number.parseInt(options.tableQuantity ?? 1, 10);
+  const tableQuantity = Number.isFinite(numericQuantity) && numericQuantity > 0 ? numericQuantity : 1;
   const values = {};
   document.querySelectorAll(".sidebar select").forEach(sel => values[sel.id] = sel.value);
 
@@ -116,10 +118,15 @@ export function updatePreview(configXML, images) {
   });
 
   // --- Artikelliste aktualisieren ---
-  renderArticleList(values);
+  values.tableQuantity = String(tableQuantity);
+  const articleResult = renderArticleList(values, tableQuantity);
 
   // --- Share-Link aktualisieren ---
   updateURL(values);
-  
 
+
+  return {
+    values,
+    articleResult,
+  };
 }
