@@ -292,10 +292,10 @@ export function renderArticleList(values, tableQuantity = 1) {
     submitBtn.className = "btn";
     submitBtn.id = "submitBtn";
     submitBtn.formTarget = "_blank";
-    if (aggregatedTotal !== null && sanitizedQuantity > 1) {
-      submitBtn.textContent = `In den Warenkorb legen (Gesamt: ${formatCurrency(aggregatedTotal)})`;
+    if (aggregatedTotal !== null) {
+      submitBtn.textContent = `In den Warenkorb legen`;
     } else {
-      submitBtn.textContent = "In den Warenkorb legen";
+      submitBtn.textContent = "Fehler";
     }
     form.appendChild(submitBtn);
 
