@@ -119,12 +119,12 @@ function setupQuantityControl() {
       </button>
       <div class="article-overlay__quantity-value" role="status" aria-live="polite">
         <span class="article-overlay__quantity-count">1</span>
-        <span class="article-overlay__quantity-total">Gesamt: –</span>
       </div>
       <button type="button" class="article-overlay__quantity-step article-overlay__quantity-step--increment" aria-label="Menge erhöhen">
         <span aria-hidden="true">+</span>
       </button>
     </div>
+    <span class="article-overlay__quantity-total">Gesamt: –</span>
   `;
 
   quantityCountEl = quantityRoot.querySelector(".article-overlay__quantity-count");
