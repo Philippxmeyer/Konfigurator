@@ -57,9 +57,9 @@ export function updateURL(values) {
   if (!requestBtn) {
     shareRoot.innerHTML = "";
 
-    const heading = document.createElement("h3");
-    heading.textContent = "Konfiguration anfragen";
-    shareRoot.appendChild(heading);
+    // const heading = document.createElement("h3");
+    // heading.textContent = "Konfiguration anfragen";
+    // shareRoot.appendChild(heading);
 
     requestBtn = document.createElement("button");
     requestBtn.id = "requestBtn";
