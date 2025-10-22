@@ -116,6 +116,8 @@ button {
   --offset-y: 0px;
   --scale-x: 1;
   --scale-y: 1;
+  --flip-x: 1;
+  --flip-y: 1;
   image-rendering: optimizeQuality;
   image-rendering: -webkit-optimize-contrast;
   transform:
@@ -124,10 +126,8 @@ button {
       calc(var(--offset-y) * var(--zoom)),
       0
     )
-    scale(
-      calc(var(--scale-x) * var(--zoom)),
-      calc(var(--scale-y) * var(--zoom))
-    );
+    scaleX(calc(var(--scale-x) * var(--zoom) * var(--flip-x)))
+    scaleY(calc(var(--scale-y) * var(--zoom) * var(--flip-y)));
 }
 
 #stage img.show { opacity: 1; }

@@ -110,11 +110,10 @@ export function updatePreview(configXML, images, options = {}) {
     // --- Bild anzeigen ---
     placeImage(images[id], `bilder/${folder}/${key}.png`, cfg);
 
-
     // Sonderfall: Container rechts → Bild spiegeln
-	if (id === "containerRechts") {
-  	images[id].style.transform += " scaleX(-1)";
-	}
+    if (id === "containerRechts") {
+      images[id].style.setProperty("--flip-x", "-1");
+    }
   });
 
   // --- Artikelliste aktualisieren ---
