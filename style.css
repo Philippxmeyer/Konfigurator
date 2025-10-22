@@ -100,13 +100,34 @@ button {
   aspect-ratio: 12 / 7;      /* entspricht z.B. 1200×700 */
   transform-origin: top left;/* Offsets bleiben stabil beim Zoom */
   will-change: transform;
+  --zoom: 1;                 /* wird per JS aktualisiert */
 }
 
 /* Bilder hängen jetzt unter #stage */
 #stage img {
   position: absolute;
+  left: 0;
+  top: 0;
   opacity: 0;
   transition: opacity 0.4s ease-in-out;
+  transform-origin: top left;
+  will-change: transform;
+  --offset-x: 0px;
+  --offset-y: 0px;
+  --scale-x: 1;
+  --scale-y: 1;
+  image-rendering: optimizeQuality;
+  image-rendering: -webkit-optimize-contrast;
+  transform:
+    translate3d(
+      calc(var(--offset-x) * var(--zoom)),
+      calc(var(--offset-y) * var(--zoom)),
+      0
+    )
+    scale(
+      calc(var(--scale-x) * var(--zoom)),
+      calc(var(--scale-y) * var(--zoom))
+    );
 }
 
 #stage img.show { opacity: 1; }
