@@ -203,6 +203,49 @@ function getSectionIdForLayer(layerId) {
   return null;
 }
 
+const HIGHLIGHT_DRAG_THRESHOLD = 4;
+const activeHighlightPointers = new Map();
+let suppressHighlightPointerUp = false;
+let suppressHighlightClick = false;
+
+function registerHighlightPointer(event) {
+  if (!(event instanceof PointerEvent)) return;
+  activeHighlightPointers.set(event.pointerId, {
+    startX: event.clientX,
+    startY: event.clientY,
+    moved: false,
+  });
+}
+
+function updateHighlightPointer(event) {
+  if (!(event instanceof PointerEvent)) return;
+  const pointerState = activeHighlightPointers.get(event.pointerId);
+  if (!pointerState || pointerState.moved) return;
+  const dx = Math.abs(event.clientX - pointerState.startX);
+  const dy = Math.abs(event.clientY - pointerState.startY);
+  if (dx >= HIGHLIGHT_DRAG_THRESHOLD || dy >= HIGHLIGHT_DRAG_THRESHOLD) {
+    pointerState.moved = true;
+  }
+}
+
+function clearHighlightPointer(event) {
+  if (!(event instanceof PointerEvent)) return;
+  const pointerState = activeHighlightPointers.get(event.pointerId);
+  if (pointerState?.moved) {
+    suppressHighlightPointerUp = true;
+    suppressHighlightClick = true;
+    window.setTimeout(() => {
+      suppressHighlightClick = false;
+    }, 0);
+  }
+  activeHighlightPointers.delete(event.pointerId);
+}
+
+document.addEventListener("pointerdown", registerHighlightPointer, true);
+document.addEventListener("pointermove", updateHighlightPointer, true);
+document.addEventListener("pointerup", clearHighlightPointer, true);
+document.addEventListener("pointercancel", clearHighlightPointer, true);
+
 function resolveHighlightTarget(event) {
   if (!(event instanceof Event)) return null;
 
@@ -236,6 +279,18 @@ function resolveHighlightTarget(event) {
 }
 
 function handleHighlightTrigger(event) {
+  if (event.type === "pointerup") {
+    if (suppressHighlightPointerUp) {
+      suppressHighlightPointerUp = false;
+      return;
+    }
+  } else if (event.type === "click") {
+    if (suppressHighlightClick) {
+      suppressHighlightClick = false;
+      return;
+    }
+  }
+
   if (event.type === "pointerup" && typeof PointerEvent !== "undefined"
     && event instanceof PointerEvent && event.pointerType === "mouse") {
     return;

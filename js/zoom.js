@@ -108,6 +108,13 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
   };
 
   const isPointOverStage = (clientX, clientY) => {
+    if (typeof document !== "undefined" && typeof document.elementFromPoint === "function") {
+      const hit = document.elementFromPoint(clientX, clientY);
+      if (hit && (hit === stage || stage.contains(hit))) {
+        return true;
+      }
+    }
+
     const rect = stage.getBoundingClientRect();
     return (
       clientX >= rect.left &&
