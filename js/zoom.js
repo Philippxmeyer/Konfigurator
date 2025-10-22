@@ -44,15 +44,17 @@ function applyTransform(stage, zoom) {
 function clientToStagePoint(stage, clientX, clientY, zoom = zoomLevel) {
   const rect = stage.getBoundingClientRect();
   return {
-    x: (clientX - rect.left - pan.x) / zoom,
-    y: (clientY - rect.top - pan.y) / zoom,
+    x: (clientX - rect.left) / zoom,
+    y: (clientY - rect.top) / zoom,
   };
 }
 
 function adjustPanForZoom(stage, stagePoint, clientX, clientY, nextZoom) {
   const rect = stage.getBoundingClientRect();
-  pan.x = clientX - rect.left - nextZoom * stagePoint.x;
-  pan.y = clientY - rect.top - nextZoom * stagePoint.y;
+  const prevPanX = pan.x;
+  const prevPanY = pan.y;
+  pan.x = prevPanX + (clientX - rect.left) - nextZoom * stagePoint.x;
+  pan.y = prevPanY + (clientY - rect.top) - nextZoom * stagePoint.y;
 }
 
 function getTouchDistance(t1, t2) {
