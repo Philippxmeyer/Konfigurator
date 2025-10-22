@@ -25,10 +25,13 @@ export function placeImage(img, src, cfg) {
     return;
   }
   fadeIn(img, src);
-  img.style.left = cfg.x + "px";
-  img.style.top = cfg.y + "px";
-  img.style.transform = `scale(${cfg.scaleX}, ${cfg.scaleY})`;
-  img.style.transformOrigin = "top left";
+  img.style.removeProperty("transform");
+  img.style.setProperty("--offset-x", `${cfg.x}px`);
+  img.style.setProperty("--offset-y", `${cfg.y}px`);
+  img.style.setProperty("--scale-x", cfg.scaleX);
+  img.style.setProperty("--scale-y", cfg.scaleY);
+  img.style.setProperty("--flip-x", "1");
+  img.style.setProperty("--flip-y", "1");
   img.style.display = "block";
 }
 

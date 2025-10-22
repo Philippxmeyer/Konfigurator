@@ -203,6 +203,90 @@ function getSectionIdForLayer(layerId) {
   return null;
 }
 
+const HIGHLIGHT_DRAG_THRESHOLD = 4;
+const CLICK_DOUBLE_CLICK_DELAY = 320;
+const activeHighlightPointers = new Map();
+let suppressHighlightPointerUp = false;
+let suppressHighlightClick = false;
+let pendingClickHighlight = null;
+
+function cancelPendingClickHighlight() {
+  if (pendingClickHighlight) {
+    window.clearTimeout(pendingClickHighlight.timeoutId);
+    pendingClickHighlight = null;
+  }
+}
+
+function clearActiveSectionHighlights() {
+  if (typeof document === "undefined") return;
+  document.querySelectorAll(".section--highlight").forEach(section => {
+    const timeoutId = sectionHighlightTimeouts.get(section);
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+      sectionHighlightTimeouts.delete(section);
+    }
+    section.classList.remove("section--highlight");
+  });
+}
+
+function registerHighlightPointer(event) {
+  if (!(event instanceof PointerEvent)) return;
+  activeHighlightPointers.set(event.pointerId, {
+    startX: event.clientX,
+    startY: event.clientY,
+    moved: false,
+    isDoubleClick: event.detail > 1,
+  });
+  if (event.detail > 1) {
+    suppressHighlightPointerUp = true;
+    suppressHighlightClick = true;
+    cancelPendingClickHighlight();
+    clearActiveSectionHighlights();
+    window.setTimeout(() => {
+      suppressHighlightClick = false;
+    }, 0);
+  }
+}
+
+function updateHighlightPointer(event) {
+  if (!(event instanceof PointerEvent)) return;
+  const pointerState = activeHighlightPointers.get(event.pointerId);
+  if (!pointerState || pointerState.moved) return;
+  const dx = Math.abs(event.clientX - pointerState.startX);
+  const dy = Math.abs(event.clientY - pointerState.startY);
+  if (dx >= HIGHLIGHT_DRAG_THRESHOLD || dy >= HIGHLIGHT_DRAG_THRESHOLD) {
+    pointerState.moved = true;
+  }
+}
+
+function clearHighlightPointer(event) {
+  if (!(event instanceof PointerEvent)) return;
+  const pointerState = activeHighlightPointers.get(event.pointerId);
+  if (pointerState?.moved) {
+    cancelPendingClickHighlight();
+    suppressHighlightPointerUp = true;
+    suppressHighlightClick = true;
+    window.setTimeout(() => {
+      suppressHighlightClick = false;
+    }, 0);
+  }
+  if (pointerState?.isDoubleClick) {
+    cancelPendingClickHighlight();
+    suppressHighlightPointerUp = true;
+    suppressHighlightClick = true;
+    clearActiveSectionHighlights();
+    window.setTimeout(() => {
+      suppressHighlightClick = false;
+    }, 0);
+  }
+  activeHighlightPointers.delete(event.pointerId);
+}
+
+document.addEventListener("pointerdown", registerHighlightPointer, true);
+document.addEventListener("pointermove", updateHighlightPointer, true);
+document.addEventListener("pointerup", clearHighlightPointer, true);
+document.addEventListener("pointercancel", clearHighlightPointer, true);
+
 function resolveHighlightTarget(event) {
   if (!(event instanceof Event)) return null;
 
@@ -236,6 +320,25 @@ function resolveHighlightTarget(event) {
 }
 
 function handleHighlightTrigger(event) {
+  if (event.type === "pointerup") {
+    if (suppressHighlightPointerUp) {
+      suppressHighlightPointerUp = false;
+      cancelPendingClickHighlight();
+      return;
+    }
+  } else if (event.type === "click") {
+    if (suppressHighlightClick) {
+      suppressHighlightClick = false;
+      cancelPendingClickHighlight();
+      return;
+    }
+    if (event.detail > 1) {
+      cancelPendingClickHighlight();
+      clearActiveSectionHighlights();
+      return;
+    }
+  }
+
   if (event.type === "pointerup" && typeof PointerEvent !== "undefined"
     && event instanceof PointerEvent && event.pointerType === "mouse") {
     return;
@@ -245,9 +348,30 @@ function handleHighlightTrigger(event) {
   if (!highlightTarget) return;
 
   const sectionId = highlightTarget.dataset.highlightSection;
-  if (sectionId) {
-    highlightSection(sectionId);
+  if (!sectionId) {
+    return;
   }
+
+  if (event.type === "click") {
+    cancelPendingClickHighlight();
+    const delay = event.detail === 0 ? 0 : CLICK_DOUBLE_CLICK_DELAY;
+    if (delay === 0) {
+      highlightSection(sectionId);
+      return;
+    }
+
+    pendingClickHighlight = {
+      sectionId,
+      timeoutId: window.setTimeout(() => {
+        highlightSection(sectionId);
+        pendingClickHighlight = null;
+      }, delay),
+    };
+    return;
+  }
+
+  cancelPendingClickHighlight();
+  highlightSection(sectionId);
 }
 
 function updatePreviousValueDatasets() {

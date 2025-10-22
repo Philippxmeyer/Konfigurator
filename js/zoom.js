@@ -9,8 +9,6 @@ const WHEEL_STEP = 0.1;
 // Ab diesem Zoom darf gepannt werden (0 = immer)
 const PAN_THRESHOLD = 0;
 
-const DEFAULT_TRANSFORM_ORIGIN = { xPct: 50, yPct: 50 };
-
 const DEFAULT_VIEW_CONFIG = {
   zoom: 1,
   panXFactor: 0.3,
@@ -38,18 +36,25 @@ const RESPONSIVE_BREAKPOINT = "(max-width: 1024px)";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
-function applyTransform(stage, zoom, originPct = null) {
-  if (originPct) {
-    stage.style.transformOrigin = `${originPct.xPct}% ${originPct.yPct}%`;
-  }
-  stage.style.transform = `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`;
+function applyTransform(stage, zoom) {
+  stage.style.setProperty("--zoom", String(zoom));
+  stage.style.transform = `translate3d(${pan.x}px, ${pan.y}px, 0)`;
 }
 
-function clientToStagePercent(stage, clientX, clientY) {
-  const r = stage.getBoundingClientRect();
-  const x = ((clientX - r.left) / r.width) * 100;
-  const y = ((clientY - r.top) / r.height) * 100;
-  return { xPct: x, yPct: y };
+function clientToStagePoint(stage, clientX, clientY, zoom = zoomLevel) {
+  const rect = stage.getBoundingClientRect();
+  return {
+    x: (clientX - rect.left) / zoom,
+    y: (clientY - rect.top) / zoom,
+  };
+}
+
+function adjustPanForZoom(stage, stagePoint, clientX, clientY, nextZoom) {
+  const rect = stage.getBoundingClientRect();
+  const prevPanX = pan.x;
+  const prevPanY = pan.y;
+  pan.x = prevPanX + (clientX - rect.left) - nextZoom * stagePoint.x;
+  pan.y = prevPanY + (clientY - rect.top) - nextZoom * stagePoint.y;
 }
 
 function getTouchDistance(t1, t2) {
@@ -103,6 +108,13 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
   };
 
   const isPointOverStage = (clientX, clientY) => {
+    if (typeof document !== "undefined" && typeof document.elementFromPoint === "function") {
+      const hit = document.elementFromPoint(clientX, clientY);
+      if (hit && (hit === stage || stage.contains(hit))) {
+        return true;
+      }
+    }
+
     const rect = stage.getBoundingClientRect();
     return (
       clientX >= rect.left &&
@@ -120,8 +132,8 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
     return null;
   };
 
-  const updateTransform = (originPct = null) => {
-    applyTransform(stage, zoomLevel, originPct);
+  const updateTransform = () => {
+    applyTransform(stage, zoomLevel);
     const canPan = zoomLevel > PAN_THRESHOLD;
     container.classList.toggle("is-grabbable", canPan);
     if (!pointerPan.active && !canPan) {
@@ -153,7 +165,7 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
     updateTransform();
   };
 
-  const applyViewFromPreset = (viewConfig, origin = DEFAULT_TRANSFORM_ORIGIN) => {
+  const applyViewFromPreset = (viewConfig) => {
     const view = viewConfig ?? fallbackView;
     const stageWidth = stage.offsetWidth;
     const zoomValue =
@@ -174,17 +186,17 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
     pan.y = panYValue;
 
     resetPointerState();
-    updateTransform(origin);
+    updateTransform();
   };
 
-  const applyInitialView = (origin = DEFAULT_TRANSFORM_ORIGIN) => {
+  const applyInitialView = () => {
     const preset = getActivePreset();
-    applyViewFromPreset(preset.initial, origin);
+    applyViewFromPreset(preset.initial);
   };
 
-  const applyResetView = (origin = DEFAULT_TRANSFORM_ORIGIN) => {
+  const applyResetView = () => {
     const preset = getActivePreset();
-    applyViewFromPreset(preset.reset, origin);
+    applyViewFromPreset(preset.reset);
   };
 
   const syncPresetFromBreakpoint = () => {
@@ -216,14 +228,14 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
       if (!isPointOverStage(e.clientX, e.clientY)) return;
 
       e.preventDefault();
-      const originPct = clientToStagePercent(stage, e.clientX, e.clientY);
-
+      const prevZoom = zoomLevel;
+      const stagePoint = clientToStagePoint(stage, e.clientX, e.clientY, prevZoom);
       const dir = Math.sign(e.deltaY);
       const step = WHEEL_STEP * (e.ctrlKey ? 2 : 1);
-      zoomLevel += dir > 0 ? -step : step;
-      zoomLevel = clamp(zoomLevel, MIN_ZOOM, MAX_ZOOM);
-
-      updateTransform(originPct);
+      const nextZoom = clamp(prevZoom + (dir > 0 ? -step : step), MIN_ZOOM, MAX_ZOOM);
+      zoomLevel = nextZoom;
+      adjustPanForZoom(stage, stagePoint, e.clientX, e.clientY, zoomLevel);
+      updateTransform();
     },
     { passive: false }
   );
@@ -281,10 +293,6 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
         pinchActive = true;
         pinchStartDist = getTouchDistance(t1, t2);
         pinchStartZoom = zoomLevel;
-
-        const center = getTouchCenter(t1, t2);
-        const originPct = clientToStagePercent(stage, center.x, center.y);
-        updateTransform(originPct);
         e.preventDefault();
         return;
       }
@@ -311,11 +319,13 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
         const dist = getTouchDistance(t1, t2);
         if (pinchStartDist > 0) {
           const ratio = dist / pinchStartDist;
-          zoomLevel = clamp(pinchStartZoom * ratio, MIN_ZOOM, MAX_ZOOM);
-
           const center = getTouchCenter(t1, t2);
-          const originPct = clientToStagePercent(stage, center.x, center.y);
-          updateTransform(originPct);
+          const prevZoom = zoomLevel;
+          const nextZoom = clamp(pinchStartZoom * ratio, MIN_ZOOM, MAX_ZOOM);
+          const stagePoint = clientToStagePoint(stage, center.x, center.y, prevZoom);
+          zoomLevel = nextZoom;
+          adjustPanForZoom(stage, stagePoint, center.x, center.y, zoomLevel);
+          updateTransform();
         }
         e.preventDefault();
         return;
@@ -377,6 +387,6 @@ export function initPreviewZoom(previewId = "preview", stageId = "stage") {
     }
   });
 
-  // Initiale Ausrichtung (Transform-Origin zentriert)
-  updateTransform(DEFAULT_TRANSFORM_ORIGIN);
+  // Initiale Ausrichtung anwenden
+  updateTransform();
 }
