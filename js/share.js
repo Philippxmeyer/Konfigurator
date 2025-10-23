@@ -18,28 +18,168 @@ const fieldOrder = [
   "tableQuantity",
 ];
 
+const ENCODING_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
+const ENCODING_BASE = ENCODING_ALPHABET.length;
+const CHARACTER_LOOKUP = new Map(Array.from(ENCODING_ALPHABET).map((char, index) => [char, index]));
+
+const FIELD_ENCODINGS = {
+  breite: ["750", "1500", "2000"],
+  gestell: ["ast31", "ast31-el"],
+  farbe: ["weissaluminium", "lichtgrau"],
+  platte: ["weiss", "buche"],
+  seitenblende: ["ohne", "links", "rechts", "links-rechts"],
+  seitenfarbe: ["gestell", "blau", "anthrazit"],
+  aufbau: ["ohne", "niedrig", "hoch"],
+  bodenanzahl: ["0", "1", "2", "3", "4"],
+  plattenanzahl: ["0", "1", "2", "3"],
+  containerfarbe: ["gestell", "blau", "anthrazit"],
+  containerpos: ["ohne", "links", "rechts", "links-rechts"],
+  laufschienenanzahl: ["0", "1", "2"],
+  ablagebord: ["ohne", "buche", "weiss"],
+  tableQuantity: { type: "range", min: 1, max: 99 },
+};
+
+const FIELD_BASES = Object.fromEntries(fieldOrder.map(field => {
+  const encoding = FIELD_ENCODINGS[field];
+  if (Array.isArray(encoding)) {
+    return [field, encoding.length];
+  }
+  if (encoding?.type === "range") {
+    return [field, encoding.max - encoding.min + 1];
+  }
+  return [field, 1];
+}));
+
 let lastConfigValues = {};
 let lastConfigURL = "";
 
-export function encodeConfig(values) {
-  // Werte in fester Reihenfolge einsammeln
-  const arr = fieldOrder.map(f => values[f] || "");
-  const compact = arr.join("|");
-  return LZString.compressToEncodedURIComponent(compact);
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
 }
 
-export function decodeConfig(str) {
+function encodeFieldIndex(field, rawValue) {
+  const encoding = FIELD_ENCODINGS[field];
+  if (Array.isArray(encoding)) {
+    const idx = encoding.indexOf(rawValue);
+    return idx >= 0 ? idx : 0;
+  }
+  if (encoding?.type === "range") {
+    const parsed = Number.parseInt(String(rawValue ?? ""), 10);
+    if (!Number.isFinite(parsed)) {
+      return 0;
+    }
+    const clamped = clamp(parsed, encoding.min, encoding.max);
+    return clamped - encoding.min;
+  }
+  return 0;
+}
+
+function decodeFieldValue(field, index) {
+  const encoding = FIELD_ENCODINGS[field];
+  if (Array.isArray(encoding)) {
+    return encoding[index] ?? encoding[0] ?? "";
+  }
+  if (encoding?.type === "range") {
+    const value = encoding.min + index;
+    return String(clamp(value, encoding.min, encoding.max));
+  }
+  return "";
+}
+
+function encodeNumber(value) {
+  if (!Number.isFinite(value) || value <= 0) {
+    return ENCODING_ALPHABET[0];
+  }
+
+  let remaining = value;
+  let encoded = "";
+  while (remaining > 0) {
+    const digit = remaining % ENCODING_BASE;
+    encoded = ENCODING_ALPHABET[digit] + encoded;
+    remaining = Math.floor(remaining / ENCODING_BASE);
+  }
+  return encoded;
+}
+
+function decodeNumber(str) {
+  if (!str || typeof str !== "string") return null;
+  let value = 0;
+  for (const char of str) {
+    const digit = CHARACTER_LOOKUP.get(char);
+    if (digit === undefined) {
+      return null;
+    }
+    value = value * ENCODING_BASE + digit;
+  }
+  return value;
+}
+
+function tryDecodeTableEncodedConfig(str) {
+  if (!str || typeof str !== "string") {
+    return null;
+  }
+  if (!/^[0-9A-Za-z_-]+$/.test(str)) {
+    return null;
+  }
+
+  const numericValue = decodeNumber(str);
+  if (numericValue === null) {
+    return null;
+  }
+
+  const values = {};
+  let remaining = numericValue;
+
+  fieldOrder.forEach(field => {
+    const base = FIELD_BASES[field] ?? 1;
+    const index = remaining % base;
+    remaining = Math.floor(remaining / base);
+    values[field] = decodeFieldValue(field, index);
+  });
+
+  if (remaining !== 0) {
+    return null;
+  }
+
+  return values;
+}
+
+function decodeLegacyConfig(str) {
   try {
     const compact = LZString.decompressFromEncodedURIComponent(str);
     if (!compact) return null;
     const arr = compact.split("|");
     const values = {};
-    fieldOrder.forEach((f, i) => values[f] = arr[i] || "");
+    fieldOrder.forEach((field, index) => {
+      values[field] = arr[index] || "";
+    });
     return values;
-  } catch (e) {
-    console.error("Fehler beim Dekodieren der Config", e);
+  } catch (error) {
+    console.error("Fehler beim Dekodieren der Config", error);
     return null;
   }
+}
+
+export function encodeConfig(values) {
+  let numericValue = 0;
+  let multiplier = 1;
+
+  fieldOrder.forEach(field => {
+    const base = FIELD_BASES[field] ?? 1;
+    const index = encodeFieldIndex(field, values[field]);
+    numericValue += index * multiplier;
+    multiplier *= base;
+  });
+
+  return encodeNumber(numericValue);
+}
+
+export function decodeConfig(str) {
+  const tableDecoded = tryDecodeTableEncodedConfig(str);
+  if (tableDecoded) {
+    return tableDecoded;
+  }
+  return decodeLegacyConfig(str);
 }
 
 export function updateURL(values) {
