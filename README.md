@@ -31,7 +31,7 @@ Der AST31 Arbeitstisch-Konfigurator ist ein vollständig clientseitiges Tool, mi
 - **Regelwerk für gültige Kombinationen:** `logic.js` sperrt unzulässige Kombinationen (z. B. AST31-EL erzwingt Weißaluminium, Aufbauten steuern Böden/Platten, Container sind bei 750 mm eingeschränkt). Der Nutzer wird gewarnt, wenn Folgeanpassungen nötig wären.
 - **Layer-basierte Vorschau:** `preview.js` kombiniert PNG-Layer mit individuellen Offsets (`offsets.js`). Werte wie Gestellfarbe werden automatisch auf abhängige Layer (Seitenblenden, Container) übertragen.
 - **Artikelliste mit Preisen:** `articles.js` generiert Links zu schaefer-shop.de, zeigt verfügbare Icons, Preise und Summen an und blendet einen POST-Formular-Button ein, um Artikel direkt in den Warenkorb zu legen.
-- **Sharing & Angebotsanfrage:** Die aktuelle Konfiguration wird komprimiert (`lz-string`) und als `?config=`-Parameter geschrieben. Im Overlay erzeugt ein Button eine formatierte Angebots-Mail inklusive Artikeltabelle und Link.
+- **Sharing & Angebotsanfrage:** Die aktuelle Konfiguration wird über eine tabellenbasierte Kodierung (max. 10 Zeichen) als `?config=`-Parameter abgelegt. Im Overlay erzeugt ein Button eine formatierte Angebots-Mail inklusive Artikeltabelle und Link; ältere Links im `lz-string`-Format bleiben weiterhin kompatibel.
 - **Zoom & Highlights:** `zoom.js` erlaubt Zoomen/Pannen per Maus, Trackpad oder Touch. Layer tragen `data-highlight-section`, sodass Klicks im Vorschaubild die zugehörige Sektion in der Sidebar hervorheben.
 - **Hilfebereich:** Ein separater Overlay-Dialog erklärt die empfohlene Vorgehensweise und lässt sich vollständig per Tastatur bedienen.
 
@@ -39,7 +39,7 @@ Der AST31 Arbeitstisch-Konfigurator ist ein vollständig clientseitiges Tool, mi
 - **HTML/CSS** für Layout, Animationen und Overlays.
 - **Vanilla JavaScript** (ES Modules) für UI-Aufbau, Geschäftslogik und Rendering.
 - **XML** (`config.xml`, `article-list.xml`) als Datenquelle.
-- **[lz-string](https://pieroxy.net/blog/pages/lz-string/index.html)** zur URL-Kodierung der Konfiguration.
+- **Eigenes Tabellen-Encoding** (Basis 64) für die URL-Kodierung der Konfiguration, ergänzt um [`lz-string`](https://pieroxy.net/blog/pages/lz-string/index.html) zur Abwärtskompatibilität.
 
 ## Schnellstart
 1. Repository klonen:
@@ -100,7 +100,7 @@ Konfigurator/
 │   ├── articleLoader.js # Lädt article-list.xml
 │   ├── share.js         # URL-Encoding & Angebots-Mail
 │   ├── zoom.js          # Zoom-/Pan-Interaktionen
-│   └── lz-string.min.js # Drittbibliothek für Komprimierung
+│   └── lz-string.min.js # Drittbibliothek für Legacy-Links
 ├── config.xml          # Produktkonfiguration & Layer-Zuordnung
 ├── article-list.xml    # Artikeldaten mit Nummern & Preisen
 ├── bilder/             # PNG-Layer, Icons & Logos
