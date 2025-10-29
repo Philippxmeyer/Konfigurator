@@ -108,6 +108,8 @@ async function init() {
   configXML.querySelectorAll("layers > layer").forEach(layerNode => {
     const id = layerNode.getAttribute("id");
     const img = document.createElement("img");
+    const zIndex = layerNode.getAttribute("zIndex");
+    img.style.zIndex = zIndex ?? "0";
     preview.appendChild(img);
     images[id] = img;
   });
