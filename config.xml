@@ -235,21 +235,21 @@
       <item id="laufschiene2-2000" x="7" y="15" scaleX="0.247" scaleY="0.247"/>
     </laufschienenOffsets>
     <bodenOffsets>
-      <item id="boden1-750" x="33" y="233" scaleX="0.4" scaleY="0.4"/>
-      <item id="boden1-1500" x="33" y="216" scaleX="0.52" scaleY="0.5"/>
-      <item id="boden1-2000" x="34" y="216" scaleX="0.456" scaleY="0.456"/>
+      <item id="boden1-750" x="33" y="233" scaleX="0.171" scaleY="0.171"/>
+      <item id="boden1-1500" x="33" y="216" scaleX="0.171" scaleY="0.171"/>
+      <item id="boden1-2000" x="34" y="216" scaleX="0.171" scaleY="0.171"/>
 
-      <item id="boden2-750" x="33" y="195" scaleX="0.4" scaleY="0.4"/>
-      <item id="boden2-1500" x="33" y="175" scaleX="0.52" scaleY="0.5"/>
-      <item id="boden2-2000" x="34" y="175" scaleX="0.456" scaleY="0.456"/>
+      <item id="boden2-750" x="33" y="195" scaleX="0.171" scaleY="0.171"/>
+      <item id="boden2-1500" x="33" y="175" scaleX="0.171" scaleY="0.171"/>
+      <item id="boden2-2000" x="34" y="175" scaleX="0.171" scaleY="0.171"/>
 
-      <item id="boden3-750" x="33" y="150" scaleX="0.4" scaleY="0.4"/>
-      <item id="boden3-1500" x="33" y="125" scaleX="0.52" scaleY="0.5"/>
-      <item id="boden3-2000" x="34" y="125" scaleX="0.456" scaleY="0.456"/>
+      <item id="boden3-750" x="33" y="150" scaleX="0.171" scaleY="0.171"/>
+      <item id="boden3-1500" x="33" y="125" scaleX="0.171" scaleY="0.171"/>
+      <item id="boden3-2000" x="34" y="125" scaleX="0.171" scaleY="0.171"/>
 
-      <item id="boden4-750" x="33" y="115" scaleX="0.4" scaleY="0.4"/>
-      <item id="boden4-1500" x="33" y="82" scaleX="0.52" scaleY="0.5"/>
-      <item id="boden4-2000" x="34" y="82" scaleX="0.456" scaleY="0.456"/>
+      <item id="boden4-750" x="33" y="115" scaleX="0.171" scaleY="0.171"/>
+      <item id="boden4-1500" x="33" y="82" scaleX="0.171" scaleY="0.171"/>
+      <item id="boden4-2000" x="34" y="82" scaleX="0.171" scaleY="0.171"/>
   </bodenOffsets>
     <containerOffsets>
     <!-- 750 mm: nur links/rechts -->
