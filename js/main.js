@@ -596,6 +596,10 @@ async function init() {
     if (sectionId) {
       img.dataset.highlightSection = sectionId;
     }
+    const zIndex = layerNode.getAttribute("zIndex");
+    if (zIndex !== null) {
+      img.style.zIndex = zIndex;
+    }
     stage.appendChild(img);
     images[id] = img;
   });
