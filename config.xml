@@ -232,14 +232,14 @@
       <item id="platte3-2000" x="48" y="71" scaleX="0.528" scaleY="0.5"/>
     </plattenOffsets>
     <laufschienenOffsets>
-      <item id="laufschiene1-750" x="17" y="58" scaleX="0.235" scaleY="0.235"/>
-      <item id="laufschiene2-750" x="9" y="53" scaleX="0.251" scaleY="0.251"/>
+      <item id="laufschiene1-750" x="16" y="58" scaleX="0.155" scaleY="0.155"/>
+      <item id="laufschiene2-750" x="10" y="53" scaleX="0.164" scaleY="0.164"/>
 
-      <item id="laufschiene1-1500" x="20" y="21" scaleX="0.251" scaleY="0.251"/>
-      <item id="laufschiene2-1500" x="11" y="15" scaleX="0.26" scaleY="0.26"/>
+      <item id="laufschiene1-1500" x="20" y="19" scaleX="0.164" scaleY="0.164"/>
+      <item id="laufschiene2-1500" x="12" y="14" scaleX="0.17" scaleY="0.17"/>
       
-      <item id="laufschiene1-2000" x="16" y="21" scaleX="0.24" scaleY="0.24"/>
-      <item id="laufschiene2-2000" x="7" y="15" scaleX="0.247" scaleY="0.247"/>
+      <item id="laufschiene1-2000" x="18" y="20" scaleX="0.167" scaleY="0.167"/>
+      <item id="laufschiene2-2000" x="11" y="15" scaleX="0.171" scaleY="0.171"/>
     </laufschienenOffsets>
     <bodenOffsets>
       <item id="boden1-750" x="27" y="233" scaleX="0.141" scaleY="0.141"/>
