@@ -120,21 +120,21 @@
         folder="grundtisch"
         keyPattern="{gestell}-{farbe}-{platte}-{breite}"
         offsetGroup="grundtische"
-        zIndex="10"
+        zIndex="1"
     />
     <layer id="seitenLinks"
         folder="seitenblenden"
         keyPattern="links-{seitenfarbe}"
         dependsOn="seitenblende:links|links-rechts"
         offsetGroup="seitenOffsets"
-        zIndex="20"
+        zIndex="2"
     />
     <layer id="seitenRechts"
         folder="seitenblenden"
         keyPattern="rechts-{seitenfarbe}"
         dependsOn="seitenblende:rechts|links-rechts"
         offsetGroup="seitenOffsets"
-        zIndex="21"
+        zIndex="2"
     />
     <!-- Aufbau: Säulen -->
     <layer id="saeulen"
@@ -142,39 +142,39 @@
            keyPattern="saeulen-{aufbau}-{breite}"
            dependsOn="aufbau:niedrig|hoch"
            offsetGroup="saeulenOffsets"
-           zIndex="30"/>
+           zIndex="3"/>
 
     <!-- Verstellbare Böden -->
-    <layer id="boden1" folder="verstellboden" keyPattern="boden-{farbe}-{breite}" dependsOn="bodenanzahl:1|2|3|4,aufbau:niedrig|hoch" offsetGroup="bodenOffsets" zIndex="40"/>
-    <layer id="boden2" folder="verstellboden" keyPattern="boden-{farbe}-{breite}" dependsOn="bodenanzahl:2|3|4,aufbau:niedrig|hoch" offsetGroup="bodenOffsets" zIndex="41"/>
-    <layer id="boden3" folder="verstellboden" keyPattern="boden-{farbe}-{breite}" dependsOn="bodenanzahl:3|4,aufbau:hoch" offsetGroup="bodenOffsets" zIndex="42"/>
-    <layer id="boden4" folder="verstellboden" keyPattern="boden-{farbe}-{breite}" dependsOn="bodenanzahl:4,aufbau:hoch" offsetGroup="bodenOffsets" zIndex="43"/>
+    <layer id="boden1" folder="verstellboden" keyPattern="boden-{farbe}-{breite}" dependsOn="bodenanzahl:1|2|3|4,aufbau:niedrig|hoch" offsetGroup="bodenOffsets" zIndex="5"/>
+    <layer id="boden2" folder="verstellboden" keyPattern="boden-{farbe}-{breite}" dependsOn="bodenanzahl:2|3|4,aufbau:niedrig|hoch" offsetGroup="bodenOffsets" zIndex="5"/>
+    <layer id="boden3" folder="verstellboden" keyPattern="boden-{farbe}-{breite}" dependsOn="bodenanzahl:3|4,aufbau:hoch" offsetGroup="bodenOffsets" zIndex="5"/>
+    <layer id="boden4" folder="verstellboden" keyPattern="boden-{farbe}-{breite}" dependsOn="bodenanzahl:4,aufbau:hoch" offsetGroup="bodenOffsets" zIndex="5"/>
 
     <!-- Lochrasterplatten -->
-    <layer id="platte1" folder="aufbau" keyPattern="platte-{farbe}-{breite}" dependsOn="plattenanzahl:1|2|3,aufbau:niedrig|hoch" offsetGroup="plattenOffsets" zIndex="50"/>
-    <layer id="platte2" folder="aufbau" keyPattern="platte-{farbe}-{breite}" dependsOn="plattenanzahl:2|3,aufbau:niedrig|hoch" offsetGroup="plattenOffsets" zIndex="51"/>
-    <layer id="platte3" folder="aufbau" keyPattern="platte-{farbe}-{breite}" dependsOn="plattenanzahl:3,aufbau:hoch" offsetGroup="plattenOffsets" zIndex="52"/>
+    <layer id="platte1" folder="aufbau" keyPattern="platte-{farbe}-{breite}" dependsOn="plattenanzahl:1|2|3,aufbau:niedrig|hoch" offsetGroup="plattenOffsets" zIndex="4"/>
+    <layer id="platte2" folder="aufbau" keyPattern="platte-{farbe}-{breite}" dependsOn="plattenanzahl:2|3,aufbau:niedrig|hoch" offsetGroup="plattenOffsets" zIndex="4"/>
+    <layer id="platte3" folder="aufbau" keyPattern="platte-{farbe}-{breite}" dependsOn="plattenanzahl:3,aufbau:hoch" offsetGroup="plattenOffsets" zIndex="4"/>
     <!-- Laufschienen -->
-    <layer id="laufschiene1" folder="laufschienen" keyPattern="laufschiene-{breite}" dependsOn="aufbau:hoch,laufschienenanzahl:1|2" offsetGroup="laufschienenOffsets" zIndex="60"/>
-    <layer id="laufschiene2" folder="laufschienen" keyPattern="laufschiene-{breite}" dependsOn="aufbau:hoch,laufschienenanzahl:2" offsetGroup="laufschienenOffsets" zIndex="61"/>
+    <layer id="laufschiene1" folder="laufschienen" keyPattern="laufschiene-{breite}" dependsOn="aufbau:hoch,laufschienenanzahl:1|2" offsetGroup="laufschienenOffsets" zIndex="4"/>
+    <layer id="laufschiene2" folder="laufschienen" keyPattern="laufschiene-{breite}" dependsOn="aufbau:hoch,laufschienenanzahl:2" offsetGroup="laufschienenOffsets" zIndex="4"/>
     <layer id="ablagebord"
            folder="ablagebord"
            keyPattern="ablagebord-{ablagebord}-{breite}"
            dependsOn="gestell:ast31,ablagebord:buche|weiss"
            offsetGroup="ablagebordOffsets"
-           zIndex="70"/>
+           zIndex="2"/>
     <layer id="containerLinks"
            folder="container"
            keyPattern="container-{farbe}-{containerfarbe}-{breite}"
            dependsOn="containerpos:links|links-rechts"
            offsetGroup="containerOffsets"
-           zIndex="80"/>
+           zIndex="3"/>
     <layer id="containerRechts"
            folder="container"
            keyPattern="container-{farbe}-{containerfarbe}-{breite}"
            dependsOn="containerpos:rechts|links-rechts"
            offsetGroup="containerOffsets"
-           zIndex="81"/>
+           zIndex="3"/>
   </layers>
  <offsets>
     <grundtische>
