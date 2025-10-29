@@ -1098,6 +1098,7 @@ select:focus-visible {
   #preview {
     padding: 20px 14px 24px;
     min-height: 400px;
+    z-index: 999;
   }
 
   .sidebar-container {
